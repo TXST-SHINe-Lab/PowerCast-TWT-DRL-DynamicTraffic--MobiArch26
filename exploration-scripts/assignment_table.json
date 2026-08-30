@@ -1,0 +1,271 @@
+{
+  "description": "CARVED assignment grid: round_robin([2, 3, 4, 5]) + split_n([2, 3, 4, 5, 6, 7, 8, 9, 10]) + weighted REHD-tail cuts (tails [4, 6, 8, 10, 12, 14] x [2, 3] comms groups).",
+  "generated": "20260825_183437",
+  "max_k": 16,
+  "num_assignments": 25,
+  "assignments": [
+    {
+      "description": "Round-robin 2-group (i mod 2)",
+      "pattern_type": "round_robin",
+      "num_groups": 2,
+      "max_groups_needed": 2,
+      "assignment_id": 0,
+      "name": "A0_rr_2"
+    },
+    {
+      "description": "Round-robin 3-group (i mod 3)",
+      "pattern_type": "round_robin",
+      "num_groups": 3,
+      "max_groups_needed": 3,
+      "assignment_id": 1,
+      "name": "A1_rr_3"
+    },
+    {
+      "description": "Round-robin 4-group (i mod 4)",
+      "pattern_type": "round_robin",
+      "num_groups": 4,
+      "max_groups_needed": 4,
+      "assignment_id": 2,
+      "name": "A2_rr_4"
+    },
+    {
+      "description": "Round-robin 5-group (i mod 5)",
+      "pattern_type": "round_robin",
+      "num_groups": 5,
+      "max_groups_needed": 5,
+      "assignment_id": 3,
+      "name": "A3_rr_5"
+    },
+    {
+      "description": "Sequential block split into 2 (REHD-tail isolator)",
+      "pattern_type": "split_n",
+      "num_groups": 2,
+      "ordering": "sequential",
+      "max_groups_needed": 2,
+      "assignment_id": 4,
+      "name": "A4_seq_2"
+    },
+    {
+      "description": "Sequential block split into 3 (REHD-tail isolator)",
+      "pattern_type": "split_n",
+      "num_groups": 3,
+      "ordering": "sequential",
+      "max_groups_needed": 3,
+      "assignment_id": 5,
+      "name": "A5_seq_3"
+    },
+    {
+      "description": "Sequential block split into 4 (REHD-tail isolator)",
+      "pattern_type": "split_n",
+      "num_groups": 4,
+      "ordering": "sequential",
+      "max_groups_needed": 4,
+      "assignment_id": 6,
+      "name": "A6_seq_4"
+    },
+    {
+      "description": "Sequential block split into 5 (REHD-tail isolator)",
+      "pattern_type": "split_n",
+      "num_groups": 5,
+      "ordering": "sequential",
+      "max_groups_needed": 5,
+      "assignment_id": 7,
+      "name": "A7_seq_5"
+    },
+    {
+      "description": "Sequential block split into 6 (REHD-tail isolator)",
+      "pattern_type": "split_n",
+      "num_groups": 6,
+      "ordering": "sequential",
+      "max_groups_needed": 6,
+      "assignment_id": 8,
+      "name": "A8_seq_6"
+    },
+    {
+      "description": "Sequential block split into 7 (REHD-tail isolator)",
+      "pattern_type": "split_n",
+      "num_groups": 7,
+      "ordering": "sequential",
+      "max_groups_needed": 7,
+      "assignment_id": 9,
+      "name": "A9_seq_7"
+    },
+    {
+      "description": "Sequential block split into 8 (REHD-tail isolator)",
+      "pattern_type": "split_n",
+      "num_groups": 8,
+      "ordering": "sequential",
+      "max_groups_needed": 8,
+      "assignment_id": 10,
+      "name": "A10_seq_8"
+    },
+    {
+      "description": "Sequential block split into 9 (REHD-tail isolator)",
+      "pattern_type": "split_n",
+      "num_groups": 9,
+      "ordering": "sequential",
+      "max_groups_needed": 9,
+      "assignment_id": 11,
+      "name": "A11_seq_9"
+    },
+    {
+      "description": "Sequential block split into 10 (REHD-tail isolator)",
+      "pattern_type": "split_n",
+      "num_groups": 10,
+      "ordering": "sequential",
+      "max_groups_needed": 10,
+      "assignment_id": 12,
+      "name": "A12_seq_10"
+    },
+    {
+      "description": "REHD-tail cut: last 4 STAs -> 1 harvest group; first 16 -> 2 comms groups",
+      "pattern_type": "weighted",
+      "ratios": [
+        0.4,
+        0.4,
+        0.2
+      ],
+      "max_groups_needed": 3,
+      "assignment_id": 13,
+      "name": "A13_cut4t_2c"
+    },
+    {
+      "description": "REHD-tail cut: last 4 STAs -> 1 harvest group; first 16 -> 3 comms groups",
+      "pattern_type": "weighted",
+      "ratios": [
+        0.267,
+        0.267,
+        0.267,
+        0.2
+      ],
+      "max_groups_needed": 4,
+      "assignment_id": 14,
+      "name": "A14_cut4t_3c"
+    },
+    {
+      "description": "REHD-tail cut: last 6 STAs -> 1 harvest group; first 14 -> 2 comms groups",
+      "pattern_type": "weighted",
+      "ratios": [
+        0.35,
+        0.35,
+        0.3
+      ],
+      "max_groups_needed": 3,
+      "assignment_id": 15,
+      "name": "A15_cut6t_2c"
+    },
+    {
+      "description": "REHD-tail cut: last 6 STAs -> 1 harvest group; first 14 -> 3 comms groups",
+      "pattern_type": "weighted",
+      "ratios": [
+        0.233,
+        0.233,
+        0.233,
+        0.3
+      ],
+      "max_groups_needed": 4,
+      "assignment_id": 16,
+      "name": "A16_cut6t_3c"
+    },
+    {
+      "description": "REHD-tail cut: last 8 STAs -> 1 harvest group; first 12 -> 2 comms groups",
+      "pattern_type": "weighted",
+      "ratios": [
+        0.3,
+        0.3,
+        0.4
+      ],
+      "max_groups_needed": 3,
+      "assignment_id": 17,
+      "name": "A17_cut8t_2c"
+    },
+    {
+      "description": "REHD-tail cut: last 8 STAs -> 1 harvest group; first 12 -> 3 comms groups",
+      "pattern_type": "weighted",
+      "ratios": [
+        0.2,
+        0.2,
+        0.2,
+        0.4
+      ],
+      "max_groups_needed": 4,
+      "assignment_id": 18,
+      "name": "A18_cut8t_3c"
+    },
+    {
+      "description": "REHD-tail cut: last 10 STAs -> 1 harvest group; first 10 -> 2 comms groups",
+      "pattern_type": "weighted",
+      "ratios": [
+        0.25,
+        0.25,
+        0.5
+      ],
+      "max_groups_needed": 3,
+      "assignment_id": 19,
+      "name": "A19_cut10t_2c"
+    },
+    {
+      "description": "REHD-tail cut: last 10 STAs -> 1 harvest group; first 10 -> 3 comms groups",
+      "pattern_type": "weighted",
+      "ratios": [
+        0.167,
+        0.167,
+        0.167,
+        0.5
+      ],
+      "max_groups_needed": 4,
+      "assignment_id": 20,
+      "name": "A20_cut10t_3c"
+    },
+    {
+      "description": "REHD-tail cut: last 12 STAs -> 1 harvest group; first 8 -> 2 comms groups",
+      "pattern_type": "weighted",
+      "ratios": [
+        0.2,
+        0.2,
+        0.6
+      ],
+      "max_groups_needed": 3,
+      "assignment_id": 21,
+      "name": "A21_cut12t_2c"
+    },
+    {
+      "description": "REHD-tail cut: last 12 STAs -> 1 harvest group; first 8 -> 3 comms groups",
+      "pattern_type": "weighted",
+      "ratios": [
+        0.133,
+        0.133,
+        0.133,
+        0.6
+      ],
+      "max_groups_needed": 4,
+      "assignment_id": 22,
+      "name": "A22_cut12t_3c"
+    },
+    {
+      "description": "REHD-tail cut: last 14 STAs -> 1 harvest group; first 6 -> 2 comms groups",
+      "pattern_type": "weighted",
+      "ratios": [
+        0.15,
+        0.15,
+        0.7
+      ],
+      "max_groups_needed": 3,
+      "assignment_id": 23,
+      "name": "A23_cut14t_2c"
+    },
+    {
+      "description": "REHD-tail cut: last 14 STAs -> 1 harvest group; first 6 -> 3 comms groups",
+      "pattern_type": "weighted",
+      "ratios": [
+        0.1,
+        0.1,
+        0.1,
+        0.7
+      ],
+      "max_groups_needed": 4,
+      "assignment_id": 24,
+      "name": "A24_cut14t_3c"
+    }
+  ]
+}

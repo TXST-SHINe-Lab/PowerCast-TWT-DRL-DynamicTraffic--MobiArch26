@@ -1,0 +1,792 @@
+{
+  "description": "CARVED grid: K in [2, 3, 4, 5, 6, 8] x 4 budget levels of the per-K feasible maximum, equal-duration SPs. Systematic lattice, EDA-swept, dominated regions pruned.",
+  "generated": "20260825_183437",
+  "beacon_interval_ms": 102.4,
+  "max_total_duration_ms": 95.0,
+  "max_k": 16,
+  "budget_fracs": [
+    0.45,
+    0.6,
+    0.75,
+    0.9
+  ],
+  "num_schedules": 24,
+  "schedules": [
+    {
+      "schedule_id": 0,
+      "name": "S0_G2_b45",
+      "description": "2g equal, durations=[21, 21], total=42ms",
+      "num_groups": 2,
+      "total_duration_ms": 42,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 21.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 21.0,
+          "sp_offset_ms": 23.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 1,
+      "name": "S1_G2_b60",
+      "description": "2g equal, durations=[28, 28], total=56ms",
+      "num_groups": 2,
+      "total_duration_ms": 56,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 28.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 28.0,
+          "sp_offset_ms": 30.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 2,
+      "name": "S2_G2_b75",
+      "description": "2g equal, durations=[35, 35], total=70ms",
+      "num_groups": 2,
+      "total_duration_ms": 70,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 35.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 35.0,
+          "sp_offset_ms": 37.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 3,
+      "name": "S3_G2_b90",
+      "description": "2g equal, durations=[42, 42], total=84ms",
+      "num_groups": 2,
+      "total_duration_ms": 84,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 42.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 42.0,
+          "sp_offset_ms": 44.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 4,
+      "name": "S4_G3_b45",
+      "description": "3g equal, durations=[14, 14, 14], total=42ms",
+      "num_groups": 3,
+      "total_duration_ms": 42,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 14.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 14.0,
+          "sp_offset_ms": 16.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 14.0,
+          "sp_offset_ms": 32.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 5,
+      "name": "S5_G3_b60",
+      "description": "3g equal, durations=[18, 18, 18], total=54ms",
+      "num_groups": 3,
+      "total_duration_ms": 54,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 18.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 18.0,
+          "sp_offset_ms": 20.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 18.0,
+          "sp_offset_ms": 40.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 6,
+      "name": "S6_G3_b75",
+      "description": "3g equal, durations=[23, 23, 23], total=69ms",
+      "num_groups": 3,
+      "total_duration_ms": 69,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 23.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 23.0,
+          "sp_offset_ms": 25.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 23.0,
+          "sp_offset_ms": 50.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 7,
+      "name": "S7_G3_b90",
+      "description": "3g equal, durations=[27, 27, 27], total=81ms",
+      "num_groups": 3,
+      "total_duration_ms": 81,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 27.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 27.0,
+          "sp_offset_ms": 29.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 27.0,
+          "sp_offset_ms": 58.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 8,
+      "name": "S8_G4_b45",
+      "description": "4g equal, durations=[10, 10, 10, 10], total=40ms",
+      "num_groups": 4,
+      "total_duration_ms": 40,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 10.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 10.0,
+          "sp_offset_ms": 12.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 10.0,
+          "sp_offset_ms": 24.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 10.0,
+          "sp_offset_ms": 36.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 9,
+      "name": "S9_G4_b60",
+      "description": "4g equal, durations=[13, 13, 13, 13], total=52ms",
+      "num_groups": 4,
+      "total_duration_ms": 52,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 13.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 13.0,
+          "sp_offset_ms": 15.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 13.0,
+          "sp_offset_ms": 30.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 13.0,
+          "sp_offset_ms": 45.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 10,
+      "name": "S10_G4_b75",
+      "description": "4g equal, durations=[17, 17, 17, 17], total=68ms",
+      "num_groups": 4,
+      "total_duration_ms": 68,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 17.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 17.0,
+          "sp_offset_ms": 19.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 17.0,
+          "sp_offset_ms": 38.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 17.0,
+          "sp_offset_ms": 57.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 11,
+      "name": "S11_G4_b90",
+      "description": "4g equal, durations=[20, 20, 20, 20], total=80ms",
+      "num_groups": 4,
+      "total_duration_ms": 80,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 20.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 20.0,
+          "sp_offset_ms": 22.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 20.0,
+          "sp_offset_ms": 44.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 20.0,
+          "sp_offset_ms": 66.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 12,
+      "name": "S12_G5_b45",
+      "description": "5g equal, durations=[8, 8, 8, 8, 8], total=40ms",
+      "num_groups": 5,
+      "total_duration_ms": 40,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 10.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 20.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 30.0
+        },
+        {
+          "group_id": 4,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 40.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 13,
+      "name": "S13_G5_b60",
+      "description": "5g equal, durations=[10, 10, 10, 10, 10], total=50ms",
+      "num_groups": 5,
+      "total_duration_ms": 50,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 10.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 10.0,
+          "sp_offset_ms": 12.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 10.0,
+          "sp_offset_ms": 24.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 10.0,
+          "sp_offset_ms": 36.0
+        },
+        {
+          "group_id": 4,
+          "wake_duration_ms": 10.0,
+          "sp_offset_ms": 48.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 14,
+      "name": "S14_G5_b75",
+      "description": "5g equal, durations=[13, 13, 13, 13, 13], total=65ms",
+      "num_groups": 5,
+      "total_duration_ms": 65,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 13.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 13.0,
+          "sp_offset_ms": 15.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 13.0,
+          "sp_offset_ms": 30.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 13.0,
+          "sp_offset_ms": 45.0
+        },
+        {
+          "group_id": 4,
+          "wake_duration_ms": 13.0,
+          "sp_offset_ms": 60.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 15,
+      "name": "S15_G5_b90",
+      "description": "5g equal, durations=[16, 16, 16, 16, 16], total=80ms",
+      "num_groups": 5,
+      "total_duration_ms": 80,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 16.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 16.0,
+          "sp_offset_ms": 18.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 16.0,
+          "sp_offset_ms": 36.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 16.0,
+          "sp_offset_ms": 54.0
+        },
+        {
+          "group_id": 4,
+          "wake_duration_ms": 16.0,
+          "sp_offset_ms": 72.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 16,
+      "name": "S16_G6_b45",
+      "description": "6g equal, durations=[6, 6, 6, 6, 6, 6], total=36ms",
+      "num_groups": 6,
+      "total_duration_ms": 36,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 6.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 6.0,
+          "sp_offset_ms": 8.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 6.0,
+          "sp_offset_ms": 16.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 6.0,
+          "sp_offset_ms": 24.0
+        },
+        {
+          "group_id": 4,
+          "wake_duration_ms": 6.0,
+          "sp_offset_ms": 32.0
+        },
+        {
+          "group_id": 5,
+          "wake_duration_ms": 6.0,
+          "sp_offset_ms": 40.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 17,
+      "name": "S17_G6_b60",
+      "description": "6g equal, durations=[8, 8, 8, 8, 8, 8], total=48ms",
+      "num_groups": 6,
+      "total_duration_ms": 48,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 10.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 20.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 30.0
+        },
+        {
+          "group_id": 4,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 40.0
+        },
+        {
+          "group_id": 5,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 50.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 18,
+      "name": "S18_G6_b75",
+      "description": "6g equal, durations=[11, 11, 11, 11, 11, 11], total=66ms",
+      "num_groups": 6,
+      "total_duration_ms": 66,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 11.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 11.0,
+          "sp_offset_ms": 13.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 11.0,
+          "sp_offset_ms": 26.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 11.0,
+          "sp_offset_ms": 39.0
+        },
+        {
+          "group_id": 4,
+          "wake_duration_ms": 11.0,
+          "sp_offset_ms": 52.0
+        },
+        {
+          "group_id": 5,
+          "wake_duration_ms": 11.0,
+          "sp_offset_ms": 65.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 19,
+      "name": "S19_G6_b90",
+      "description": "6g equal, durations=[13, 13, 13, 13, 13, 13], total=78ms",
+      "num_groups": 6,
+      "total_duration_ms": 78,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 13.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 13.0,
+          "sp_offset_ms": 15.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 13.0,
+          "sp_offset_ms": 30.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 13.0,
+          "sp_offset_ms": 45.0
+        },
+        {
+          "group_id": 4,
+          "wake_duration_ms": 13.0,
+          "sp_offset_ms": 60.0
+        },
+        {
+          "group_id": 5,
+          "wake_duration_ms": 13.0,
+          "sp_offset_ms": 75.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 20,
+      "name": "S20_G8_b45",
+      "description": "8g equal, durations=[5, 5, 5, 5, 5, 5, 5, 5], total=40ms",
+      "num_groups": 8,
+      "total_duration_ms": 40,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 5.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 5.0,
+          "sp_offset_ms": 7.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 5.0,
+          "sp_offset_ms": 14.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 5.0,
+          "sp_offset_ms": 21.0
+        },
+        {
+          "group_id": 4,
+          "wake_duration_ms": 5.0,
+          "sp_offset_ms": 28.0
+        },
+        {
+          "group_id": 5,
+          "wake_duration_ms": 5.0,
+          "sp_offset_ms": 35.0
+        },
+        {
+          "group_id": 6,
+          "wake_duration_ms": 5.0,
+          "sp_offset_ms": 42.0
+        },
+        {
+          "group_id": 7,
+          "wake_duration_ms": 5.0,
+          "sp_offset_ms": 49.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 21,
+      "name": "S21_G8_b60",
+      "description": "8g equal, durations=[6, 6, 6, 6, 6, 6, 6, 6], total=48ms",
+      "num_groups": 8,
+      "total_duration_ms": 48,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 6.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 6.0,
+          "sp_offset_ms": 8.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 6.0,
+          "sp_offset_ms": 16.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 6.0,
+          "sp_offset_ms": 24.0
+        },
+        {
+          "group_id": 4,
+          "wake_duration_ms": 6.0,
+          "sp_offset_ms": 32.0
+        },
+        {
+          "group_id": 5,
+          "wake_duration_ms": 6.0,
+          "sp_offset_ms": 40.0
+        },
+        {
+          "group_id": 6,
+          "wake_duration_ms": 6.0,
+          "sp_offset_ms": 48.0
+        },
+        {
+          "group_id": 7,
+          "wake_duration_ms": 6.0,
+          "sp_offset_ms": 56.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 22,
+      "name": "S22_G8_b75",
+      "description": "8g equal, durations=[8, 8, 8, 8, 8, 8, 8, 8], total=64ms",
+      "num_groups": 8,
+      "total_duration_ms": 64,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 10.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 20.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 30.0
+        },
+        {
+          "group_id": 4,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 40.0
+        },
+        {
+          "group_id": 5,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 50.0
+        },
+        {
+          "group_id": 6,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 60.0
+        },
+        {
+          "group_id": 7,
+          "wake_duration_ms": 8.0,
+          "sp_offset_ms": 70.0
+        }
+      ]
+    },
+    {
+      "schedule_id": 23,
+      "name": "S23_G8_b90",
+      "description": "8g equal, durations=[9, 9, 9, 9, 9, 9, 9, 9], total=72ms",
+      "num_groups": 8,
+      "total_duration_ms": 72,
+      "groups": [
+        {
+          "group_id": 0,
+          "wake_duration_ms": 9.0,
+          "sp_offset_ms": 0.0
+        },
+        {
+          "group_id": 1,
+          "wake_duration_ms": 9.0,
+          "sp_offset_ms": 11.0
+        },
+        {
+          "group_id": 2,
+          "wake_duration_ms": 9.0,
+          "sp_offset_ms": 22.0
+        },
+        {
+          "group_id": 3,
+          "wake_duration_ms": 9.0,
+          "sp_offset_ms": 33.0
+        },
+        {
+          "group_id": 4,
+          "wake_duration_ms": 9.0,
+          "sp_offset_ms": 44.0
+        },
+        {
+          "group_id": 5,
+          "wake_duration_ms": 9.0,
+          "sp_offset_ms": 55.0
+        },
+        {
+          "group_id": 6,
+          "wake_duration_ms": 9.0,
+          "sp_offset_ms": 66.0
+        },
+        {
+          "group_id": 7,
+          "wake_duration_ms": 9.0,
+          "sp_offset_ms": 77.0
+        }
+      ]
+    }
+  ]
+}

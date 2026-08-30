@@ -1,0 +1,79 @@
+====================================================================================
+STRUCTURED PER-DEVICE EVAL  —  model  vs  analytical_md1
+run=/workspace/ns-allinone-3.44/ns-3.44/contrib/ai/examples/mobarok/results/runs/repro_20260825/pipeline/eval
+scenarios=80  splits(n_rehd)=[np.int64(4), np.int64(8), np.int64(12), np.int64(16)]  rows=304,000  paired-stats=Wilcoxon
+====================================================================================
+
+[1] OVERALL (all device classes, paired by scenario)
+  metric              model analytical      delta bettr%        p
+  --------------------------------------------------------------
+  served_ratio       0.8748     0.9261    -0.0513    28 3.70e-04
+  delivered_ratio     0.5590     0.6047    -0.0457    35    0.001
+  admitted_frac      0.6584     0.6725    -0.0141    36    0.005
+  drop_rate          0.1673     0.1168     0.0505    34 4.39e-04
+  throughput_B   147576.2344 195337.0678 -47760.8334    39 4.29e-05
+  latency_ms       771.1929   746.5322    24.6607    48    0.182
+  reward            -0.6770    -1.0038     0.3268    89 1.43e-10
+  fairness(Jain)     0.8762     0.7712     0.1051    88 3.30e-12
+
+[2] PER DEVICE CLASS  (model vs baseline; delta>0 better for served/thru, worse for drop/lat)
+  --- IoT ---
+     metric            model analytical      delta bettr%        p
+     served_ratio     0.9978     0.9918     0.0060     8    0.605
+     delivered_ratio     0.9506     0.9661    -0.0156    29 9.35e-04
+     admitted_frac     0.9752     0.9826    -0.0074    34    0.006
+     drop_rate        0.0258     0.0175     0.0083    24 1.72e-04
+     throughput_B 54114.1735 55527.0373 -1412.8638    36    0.004
+     latency_ms      83.6556    73.4918    10.1638    30 7.09e-04
+  --- Camera ---
+     metric            model analytical      delta bettr%        p
+     served_ratio     0.7099     0.8298    -0.1199    24 9.75e-06
+     delivered_ratio     0.4835     0.5757    -0.0922    29 4.56e-04
+     admitted_frac     0.7059     0.7203    -0.0144    35    0.050
+     drop_rate        0.3292     0.2168     0.1124    24 1.51e-05
+     throughput_B 861357.7753   1.04e+06 -175770.8233    29 2.93e-04
+     latency_ms    1254.6095  1101.7647   152.8448    29 6.19e-04
+  --- Voice ---
+     metric            model analytical      delta bettr%        p
+     served_ratio     1.0000     0.9974     0.0026     1    0.317
+     delivered_ratio     0.9652     0.9739    -0.0087    35    0.002
+     admitted_frac     0.9685     0.9782    -0.0097    34    0.002
+     drop_rate        0.0036     0.0043  -6.55e-04    20 2.95e-04
+     throughput_B 31884.5591 32570.7395  -686.1803    35    0.001
+     latency_ms      94.7353    74.0114    20.7239    23 2.10e-06
+  --- Video ---
+     metric            model analytical      delta bettr%        p
+     served_ratio     0.8017     0.9061    -0.1044    24 3.23e-04
+     delivered_ratio     0.2832     0.3491    -0.0659    27    0.002
+     admitted_frac     0.3602     0.3910    -0.0308    31    0.011
+     drop_rate        0.2352     0.1294     0.1058    24 2.97e-04
+     throughput_B   1.01e+06   1.20e+06 -187344.7579    27    0.004
+     latency_ms    2050.9541  1859.6696   191.2846    31    0.009
+  --- REHD ---
+     metric            model analytical      delta bettr%        p
+     served_ratio     0.5078     0.3169     0.1909    81 6.51e-10
+     delivered_ratio     0.0469     0.0458     0.0011    51    0.903
+     admitted_frac     0.1160     0.1893    -0.0733    34 5.65e-05
+     drop_rate        0.7411     0.8768    -0.1357    60 5.37e-08
+     throughput_B    82.1779    98.5533   -16.3754    41    0.035
+     latency_ms      55.2281    55.5520    -0.3239    60    0.296
+
+[3] REHD ENERGY  (oracle; the harvesting story)
+     metric            model analytical      delta bettr%        p
+     harvested_J      0.0365     0.0433    -0.0068    51    0.013
+     consumed_J       0.4969     0.9391    -0.4422    16 1.67e-07
+     sustain_H/C      0.3097     0.2555     0.0542    81 8.20e-07
+     soc              0.8974     0.8810     0.0164    90 2.22e-10
+     unpowered_tx     7.0375     6.5500     0.4875    44    0.840
+
+[4] BY REHD-SPLIT  (served_ratio / reward, model vs baseline)
+   n_rehd  served(m)  served(b)    rew(m)    rew(b)
+        4     0.8023     1.0000     -1.03     -1.20
+        8     0.8578     0.9803     -0.70     -1.39
+       12     0.8298     0.8674     -0.60     -0.79
+       16     0.9838     0.8409     -0.38     -0.63
+
+[5] BY LOAD SEGMENT  (served_ratio / reward)
+    segment  served(m)  served(b)    rew(m)    rew(b)
+       over     0.8029     0.9189     -0.74     -1.04
+      under     0.9394     1.0000     -0.62     -0.97

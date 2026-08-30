@@ -1,0 +1,159 @@
+# PowerCast Energy Harvester Configuration File
+# Format: NodeID CapacitorClass VoltageClass
+# 
+# CapacitorClass Definitions (values in microfarads - μF):
+# CAP_A 500       (500μF / 0.5mF Electrolytic - Small)
+# CAP_B 2200      (2200μF / 2.2mF Electrolytic - Medium)
+# CAP_C 20000     (20000μF / 20mF Electrolytic - Large)
+#
+# VoltageClass:
+#   1 = 1.2V thresholds (VMAX=1.25V, VMIN=1.02V)
+#   2 = 0.9V thresholds (VMAX=0.945V, VMIN=0.9V)
+#   3 = 0.7V thresholds (VMAX=0.738V, VMIN=0.64V)
+#
+# This file demonstrates all 9 combinations (3 caps × 3 voltages)
+
+# ============================================================
+# GROUP 1: All 9 combinations - Complete matrix (Nodes 0-8)
+# ============================================================
+# Small Cap (500μF / 0.5mF) with all voltage classes
+0 A 1
+1 A 2
+2 A 3
+# Medium Cap (2200μF / 2.2mF) with all voltage classes
+3 B 1
+4 B 2
+5 B 3
+# Large Cap (20000μF / 20mF) with all voltage classes
+6 C 1
+7 C 2
+8 C 3
+
+# ============================================================
+# GROUP 2: Repeated matrix for statistical comparison (Nodes 9-17)
+# ============================================================
+9 A 1
+10 A 2
+11 A 3
+12 B 1
+13 B 2
+14 B 3
+15 C 1
+16 C 2
+17 C 3
+
+# ============================================================
+# GROUP 3: High voltage class focus - 1.2V (Nodes 18-26)
+# ============================================================
+18 A 1
+19 A 1
+20 A 1
+21 B 1
+22 B 1
+23 B 1
+24 C 1
+25 C 1
+26 C 1
+
+# ============================================================
+# GROUP 4: Medium voltage class focus - 0.9V (Nodes 27-35)
+# ============================================================
+27 A 2
+28 A 2
+29 A 2
+30 B 2
+31 B 2
+32 B 2
+33 C 2
+34 C 2
+35 C 2
+
+# ============================================================
+# GROUP 5: Low voltage class focus - 0.7V (Nodes 36-44)
+# ============================================================
+36 A 3
+37 A 3
+38 A 3
+39 B 3
+40 B 3
+41 B 3
+42 C 3
+43 C 3
+44 C 3
+
+# ============================================================
+# GROUP 6: Small capacitor focus - 50mF (Nodes 45-53)
+# ============================================================
+45 A 1
+46 A 2
+47 A 3
+48 A 1
+49 A 2
+50 A 3
+51 A 1
+52 A 2
+53 A 3
+
+# ============================================================
+# GROUP 7: Medium capacitor focus - 220mF (Nodes 54-62)
+# ============================================================
+54 B 1
+55 B 2
+56 B 3
+57 B 1
+58 B 2
+59 B 3
+60 B 1
+61 B 2
+62 B 3
+
+# ============================================================
+# GROUP 8: Large capacitor focus - 2000mF (Nodes 63-71)
+# ============================================================
+63 C 1
+64 C 2
+65 C 3
+66 C 1
+67 C 2
+68 C 3
+69 C 1
+70 C 2
+71 C 3
+
+# ============================================================
+# GROUP 9: Alternating pattern for diversity (Nodes 72-89)
+# ============================================================
+72 A 1
+73 B 2
+74 C 3
+75 A 2
+76 B 3
+77 C 1
+78 A 3
+79 B 1
+80 C 2
+81 A 1
+82 B 2
+83 C 3
+84 A 2
+85 B 3
+86 C 1
+87 A 3
+88 B 1
+89 C 2
+
+# ============================================================
+# GROUP 10: Extended nodes (90-99) - Mixed for scalability testing
+# ============================================================
+90 A 1
+91 B 1
+92 C 1
+93 A 2
+94 B 2
+95 C 2
+96 A 3
+97 B 3
+98 C 3
+99 A 1
+
+# Additional nodes will cycle through configurations automatically

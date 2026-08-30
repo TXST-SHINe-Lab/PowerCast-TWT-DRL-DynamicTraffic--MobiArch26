@@ -1,0 +1,19 @@
+{
+  "timestamp": "20260825_183437",
+  "git_sha": "0dbc6c1076bdba9038819e2cb98909161e4efab8",
+  "n_episodes": 2000,
+  "num_batches": 100,
+  "num_workers": 20,
+  "n_stations": 12,
+  "n_rehd": 8,
+  "reward_preset": "twt_pf_demand_v5",
+  "base_seed": 50000,
+  "updates_per_episode": 100,
+  "grid": 6000,
+  "sweep": "schedule-major (g*75+u)%1600",
+  "shards_written": 2000,
+  "total_rows": 4000000,
+  "skipped": 0,
+  "failures": [],
+  "wall_sec": 16964.6579310894
+}

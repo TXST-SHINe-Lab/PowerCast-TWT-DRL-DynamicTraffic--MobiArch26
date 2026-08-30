@@ -1,0 +1,33 @@
+{
+ "feature_order": [
+  "bsr_be",
+  "dpkts_rx",
+  "dairtime",
+  "dfcs",
+  "snr",
+  "silence",
+  "starv_rate"
+ ],
+ "mean": [
+  0.3628465967712216,
+  0.4197195636973679,
+  0.4689182977832481,
+  0.2336312715323344,
+  0.35350685875402393,
+  0.4193631794710113,
+  0.48225737410730124
+ ],
+ "std": [
+  0.34513074257178267,
+  0.36348053420715937,
+  0.3651118887450304,
+  0.2946522587780707,
+  0.23262415434890285,
+  0.4526909429667752,
+  0.3855121700787428
+ ],
+ "count": 4000000,
+ "transform_norms": {},
+ "source": "refit from shards (2000 shards / 4000000 rows)",
+ "note": "post-transform pre-zscore stats for the 7-feat time-local obs; transform_norms copied from the previous file (obs-builder constants unchanged)."
+}

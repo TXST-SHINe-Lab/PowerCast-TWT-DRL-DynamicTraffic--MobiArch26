@@ -1,0 +1,17 @@
+# Python deps for the rl-twt-powercast TWT + PowerCast RL pipeline. Tested on Python 3.11.15.
+#
+# IMPORTANT for the DGX Spark (ARM64 + GPU):
+#   * Install torch for YOUR platform/CUDA — do NOT use a +cpu wheel. Use the ARM64/CUDA build
+#     (e.g. NVIDIA's PyTorch index). The version below is the tested baseline; match or exceed it.
+#   * The ns3-ai PYTHON package is NOT installed from here — it comes from the ns3-ai contrib
+#     module (part of your fresh ns-3.44 + ns3-ai setup). The wrapper imports it for the SHM IPC.
+#
+torch>=2.1            # tested: 2.12.0  (use the ARM64/CUDA build on the DGX, not +cpu)
+numpy>=1.24           # tested: 2.0.2
+pandas>=2.0           # tested: 3.0.3
+pyarrow>=14           # tested: 24.0.0  (EDA parquet shards)
+matplotlib>=3.7       # tested: 3.10.9  (plots)
+gymnasium>=0.29       # tested: 1.3.0
+cloudpickle>=3.0      # tested: 3.1.2   (worker pickling)
+protobuf>=4           # tested: 5.29.6  (ns3-ai)
+tensorboard>=2.15     # tested: 2.18.0  (training scalars)

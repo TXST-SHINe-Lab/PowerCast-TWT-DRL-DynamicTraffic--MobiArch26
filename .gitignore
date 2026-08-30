@@ -1,0 +1,153 @@
+# PERSONAL fork — this branch keeps the full research trail (design-phase
+# EDA/diagnostic scripts, exploratory policy archs, insight docs) that the
+# published 'main'/public snapshot deliberately drops. Only genuine data
+# piles (raw shards/checkpoints/tensorboard binaries) are excluded below.
+
+# Archived journey: docs/scripts kept on disk for reference, not pushed
+code-dump/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data artifacts - exclude runtime data logs, but keep the dir (sim writes here and
+# does not create it; a direct ./ns3 run on a fresh clone needs it to exist).
+
+# Exploration/EDA - exclude raw per-episode logs/transitions (keep summary data)
+exploration-scripts/eda-data/*/logs/
+exploration-scripts/eda-data/*/transitions/
+
+# Training / eval / EDA run outputs — keep small insight artifacts (reports,
+# manifests, findings, fitted norms, figures), drop heavy regenerable data
+# (parquet shards, checkpoints, tensorboard event files).
+# ...EXCEPT the two classes of artifact the paper's tables are derived from. These
+# rules previously dropped BOTH silently when the tree was moved through git, which
+# is how the published run's checkpoint and its eval shards were lost: the surviving
+# file set under runs/ was exactly the whitelist above, and exactly the two rules
+# below were the gap. Tables 3 and 4 cannot be regenerated without them, so they are
+# publication artifacts, not scratch.
+ppo-sb3-scripts/checkpoints/
+ppo-sb3-scripts/eval_results/
+ppo-sb3-scripts/tb_logs/
+ppo-sb3-scripts/plots/
+
+# Reward-exploration EDA outputs (scripts tracked, data regenerable)
+reward-exploration/runs/
+
+# Schedule-sensitivity diagnostic outputs (regenerated from make_fixed_ckpts.py
+# + twt_evaluator.py)
+ppo-sb3-scripts/sensitivity_results/
+ppo-sb3-scripts/sensitivity_over_time_results/
+ppo-sb3-scripts/fixed_ckpts/
+
+# Model artifacts (raw checkpoints — heavy, regenerable from training)
+*.pt
+*.npz
+
+# Paper directory (private, not for git)
+paper/
+
+# Build artifacts
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.o
+*.a
+
+# Temporary files
+/tmp/
+*.log
+.#*
+powercest-main/
+twt-rl/
+
+# Pretrained checkpoint shipped to reproduce the latest eval (overrides *.pt)
+!pretrained/
+!pretrained/ckpt_final.pt
+
+# =====================================================================
+# SINGLE GENERATED-OUTPUT ROOT  (results/)  -- SHIPPING POLICY
+# =====================================================================
+# Everything the pipeline produces lives under results/. A clean slate is
+# `rm -rf results/`.
+#
+#   SHIPPED   eval shards (Tables 3+4 provenance), reports/CSVs, figures,
+#             training log + hyperparams, INTERMEDIATE checkpoints, and the
+#             tensorboard event files.
+#   DROPPED   EDA shards (1.1 GB, regenerable by re-running stage 2) and the
+#             raw per-run NS-3 trace dumps under data-log/ (see below).
+results/**
+!results/.gitkeep
+!results/**/
+!results/**/*.txt
+!results/**/*.md
+!results/**/*.json
+!results/**/*.png
+!results/**/*.jsonl
+!results/**/*.csv
+!results/**/*.pt
+!results/**/eval*/shards/
+!results/**/eval*/shards/*.parquet
+!results/**/events.out.tfevents.*
+# EDA shards are the one bulk exclusion: 1.1 GB, and stage 2 regenerates them.
+results/**/eda/shards/**
+
+# Raw NS-3 per-run trace dumps. The sim writes a fresh device_class_assignments
+# file into data-log/ on (almost) every run, so this is unbounded churn, not
+# source. Nothing here is a required input: reproduce.sh stage 3 re-runs the
+# vcap sims to recreate vcap_trace_*.csv, and the figure's distilled input
+# (results/figs/vcap_data.csv) plus results/figs/vcap.png stay tracked.
+# run_pipeline.sh mkdir -p's the directory, so it needs no .gitkeep.
+results/data-log/**
+
+# Pretrained: the paper's final model + its provenance.
+!pretrained/
+!pretrained/ckpt_final.pt
+!pretrained/hyperparams.json
+!pretrained/training_log.jsonl
+!pretrained/README.md
+
+# NOT part of the code artifact: the paper sources and all internal working notes.
+curated-repo/
+paper-camera-ready/
+paper-mobicom-submited/
+paper-draft/
