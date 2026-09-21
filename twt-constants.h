@@ -5,6 +5,11 @@
 // Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
 // PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
 
+/**
+ * @file twt-constants.h
+ * @brief Compile-time constants for the TWT + PowerCast simulation: sizing, timing, RF deployment, energy, traffic
+ */
+
 #ifndef TWT_CONSTANTS_H
 #define TWT_CONSTANTS_H
 

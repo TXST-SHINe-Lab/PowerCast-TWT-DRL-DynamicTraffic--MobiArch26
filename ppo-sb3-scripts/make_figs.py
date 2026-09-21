@@ -8,11 +8,12 @@
 
 """make_figs.py — generate ALL data-driven paper figures in one place.
 
-Run:  python3.11 make_figs.py            (writes into paper-draft/figs/)
+Run:  python3.11 make_figs.py                       (latest finished run -> <run>/figs/)
+      RUN=repro_20260825 STAGES="4" bash reproduce.sh (same, for a named run)
 
 Figures produced:
   harvest_curve.png  — PowerCast datasheet RF-to-DC efficiency + harvested power vs distance (analytical)
-  vcap.png           — REHD capacitor V_cap vs time by distance, 0.7 V class (from figs/vcap_data.csv)
+  vcap.png           — REHD capacitor V_cap vs time by distance, 0.7 V class (from vcap_data.csv)
   eval_perclass.png  — DRL vs M/D/1: per-class served/drop + alpha-fair reward/fairness vs #harvesters
   training_curve.png — LSTM-PPO + asymmetric-critic mean episode reward over training
 
@@ -21,11 +22,14 @@ DRL vs M/D/1) used as the paper's in-text T1/T2 figures.
 
 NOT generated here (hand-drawn vector art, kept as-is): system_model.jpg, beacon_interval.jpg.
 
-Data sources — edit these after re-running train/eval/sim:
-  EVAL_DIR   : eval shards (parquet) of the DRL-vs-M/D/1 structured eval
-  TRAIN_DIRS : training_log.jsonl run dir(s); stitched in order (handles resume)
-  VCAP_DATA  : committed small CSV (extracted REHD V_cap traces) for vcap.png
+Data sources (each overridable by environment variable):
+  PAPER_RUN_DIR    : run folder results/runs/<run>/; default = the run with the newest pipeline/eval/report.txt
+  PAPER_FIGS_DIR   : output directory; default <run>/figs/
+  PAPER_EVAL_DIR   : eval shards (parquet) of the DRL-vs-M/D/1 structured eval; default <run>/pipeline/eval/shards/
+  PAPER_TRAIN_GLOB : training_log.jsonl file(s), stitched in order (handles resume); default <run>/pipeline/train/*/training_log.jsonl
+  PAPER_VCAP_DATA  : extracted REHD V_cap traces for vcap.png; default <run>/figs/vcap_data.csv, else the committed results/figs/vcap_data.csv
 Each figure is independent: a missing data source skips only that figure.
+With the committed run the four PNGs are byte-identical to the paper's.
 """
 
 import os
@@ -39,32 +43,51 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-PROJ_ = os.path.dirname(HERE)
-# Figures land in the camera-ready paper dir by default.
-# (This script used to live in paper-draft/ and write beside itself -- which is how it got deleted along with the generated figures.
-# It is source; it now lives with the other scripts.)
-FIGS = os.environ.get(
-    "PAPER_FIGS_DIR", os.path.join(PROJ_, "paper-camera-ready", "figs")
-)
-os.makedirs(FIGS, exist_ok=True)
-PROJ = PROJ_
-RUNS = os.path.join(PROJ, "ppo-sb3-scripts", "runs")
+PROJ = os.path.dirname(HERE)
+RESULTS = os.path.join(PROJ, "results")
+
+
+def _latest_run():
+    """Run folder under results/runs/ whose eval report was written last, or "" if none."""
+    reports = glob.glob(
+        os.path.join(RESULTS, "runs", "*", "pipeline", "eval", "report.txt")
+    )
+    if not reports:
+        return ""
+    return os.path.dirname(
+        os.path.dirname(os.path.dirname(max(reports, key=os.path.getmtime)))
+    )
+
 
 # --- data sources ---
-# Defaults point at the shipped run; the reproducer (reproduce.sh) overrides via env so figures regenerate from a freshly-trained/evaluated run.
-_RUN = os.environ.get(
-    "PAPER_RUN_DIR", os.path.join(RUNS, "train_v5_carved_20260622_005807")
+# Default to the latest finished run; reproduce.sh stage 4 sets every variable explicitly for the run it just produced.
+_RUN = os.environ.get("PAPER_RUN_DIR") or _latest_run()
+FIGS = os.environ.get(
+    "PAPER_FIGS_DIR",
+    os.path.join(_RUN, "figs") if _RUN else os.path.join(RESULTS, "figs"),
 )
-EVAL_DIR = os.environ.get("PAPER_EVAL_DIR", os.path.join(_RUN, "eval_md1", "shards"))
+os.makedirs(FIGS, exist_ok=True)
+EVAL_DIR = os.environ.get(
+    "PAPER_EVAL_DIR", os.path.join(_RUN, "pipeline", "eval", "shards")
+)
 TRAIN_DIRS = sorted(
     glob.glob(
         os.environ.get(
             "PAPER_TRAIN_GLOB",
-            os.path.join(_RUN, "twt_lstm_ppo_*", "training_log.jsonl"),
+            os.path.join(_RUN, "pipeline", "train", "*", "training_log.jsonl"),
         )
     )
 )
-VCAP_DATA = os.environ.get("PAPER_VCAP_DATA", os.path.join(FIGS, "vcap_data.csv"))
+# A run without its own stage-3 traces (e.g. the committed repro_20260825) falls back to the committed CSV.
+_VCAP_RUN = os.path.join(FIGS, "vcap_data.csv")
+VCAP_DATA = os.environ.get(
+    "PAPER_VCAP_DATA",
+    (
+        _VCAP_RUN
+        if os.path.exists(_VCAP_RUN)
+        else os.path.join(RESULTS, "figs", "vcap_data.csv")
+    ),
+)
 # Episodes per batch for the training-curve x-axis.
 # This is `--episodes-per-batch`, NOT `--num-workers`: a pool of W workers can be driven through more than W episodes per batch (the shipped run is 16 workers x 24 episodes).
 # It used to be hardcoded to 16, which plotted the 200x24 = 4800-episode run as if it were 3200.
@@ -289,7 +312,17 @@ def eval_perclass():
         return float(np.mean(js)) if js else np.nan
 
     sp = sorted(df.n_rehd.unique())
-    plt.rcParams.update({"font.size": 11})
+    # The sizes the paper figure was rendered with (they used to leak in from harvest_curve's rcParams).
+    plt.rcParams.update(
+        {
+            "font.size": 11,
+            "axes.titlesize": 15,
+            "axes.labelsize": 17,
+            "xtick.labelsize": 14,
+            "ytick.labelsize": 14,
+            "legend.fontsize": 12,
+        }
+    )
     fig, ax = plt.subplots(2, 2, figsize=(9, 6.4))
     x = np.arange(len(ORDER))
     w = 0.38
@@ -401,7 +434,8 @@ def print_rehd_sustainability():
 
     print("\n===== REHD sustainability: DRL vs M/D/1 (paper tab numbers) =====")
     print(
-        f"  harvested (mJ/STA)        : DRL {harv_mj(mr):6.3f}  M/D/1 {harv_mj(br):6.3f}   (tie)"
+        f"  harvested (mJ/STA)        : DRL {harv_mj(mr):6.3f}  M/D/1 {harv_mj(br):6.3f}   "
+        f"({harv_mj(mr) / max(harv_mj(br), EPS):.2f}x)"
     )
     print(
         f"  consumed  (mJ/STA)        : DRL {cons_mj(mr):6.1f}  M/D/1 {cons_mj(br):6.1f}   "
@@ -480,8 +514,11 @@ if __name__ == "__main__":
         print_rehd_sustainability,
         training_curve,
     ):
+        # Every figure starts from matplotlib defaults; rcParams set by one figure must not restyle the next.
+        plt.rcdefaults()
         try:
             fn()
         except Exception as e:
             print(f"FAILED {fn.__name__}: {e}")
+    print("run     ->", _RUN or "(none found)")
     print("figures ->", FIGS)

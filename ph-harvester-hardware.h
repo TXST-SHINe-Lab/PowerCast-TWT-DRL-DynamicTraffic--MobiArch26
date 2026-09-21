@@ -7,26 +7,16 @@
 
 /**
  * @file ph-harvester-hardware.h
- * @brief Advanced PowerCast RF Energy Harvester Interface
+ * @brief PowerCast P21XXCSR-EVB RF energy harvester model (rectenna + boost converter + storage capacitor)
  *
- * Header file for production-grade RF energy harvesting device based on P21XXCSR-EVB
- * Band 6 specifications. Features advanced energy management with nominal/sunk/available
- * energy separation, realistic 2.4GHz efficiency modeling, comprehensive safety mechanisms,
- * and flexible configuration system for large-scale wireless network deployments.
+ * One REHD's harvester: the Band-6 (2450 MHz) RF-to-DC efficiency curve from the datasheet, a storage capacitor whose energy is split into nominal/sunk/available, and the TX energy audit that gates uplink.
  *
- * Key Features:
- * - Advanced three-tier energy model (nominal/sunk/available energy tracking)
- * - Realistic P21XXCSR-EVB Band 6 efficiency curve with 2450 MHz optimization
- * - Input power clamping at +15 dBm maximum rating with sensitivity handling
- * - Deep discharge protection with configurable DEEP_RATIO (hard floor at 80% of Vmin)
- * - Overshoot protection with SHOOT_RATIO (150% of Vmax) voltage limiting
- * - Critical error detection for unrealistic energy consumption scenarios
- * - Pre-transmission energy validation with CanSustainTransmission() method
- * - Output enable checking with 80% Vmin safety threshold
- * - Three-class capacitor system: CLASS_A, CLASS_B, CLASS_C (values from config file)
- * - Three-voltage threshold system: 1.2V, 0.9V, 0.7V operation modes
- * - Fixed 85% boost-converter efficiency (datasheet); 90% PA efficiency
- * - Comprehensive NS-3 integration with trace sources and attributes
+ * - Efficiency: 0 below -12 dBm, ~46% peak at +8 dBm, held flat above; input clamped at the +15 dBm rating
+ * - Fixed 85% boost-converter efficiency (datasheet) on harvest, 75% PA / RF-chain efficiency on TX
+ * - Strict two-threshold capacitor: TX may not take Vcap below Vmin (DEEP_RATIO = 1.0), harvest stops at Vmax (SHOOT_RATIO = 1.0)
+ * - CanSustainTransmission() is the pre-TX audit; IsOutputEnabled() and ComputePhase() use the same floor
+ * - Capacitor classes A/B/C (values from ph-harvester-config.txt, no hardcoded defaults) x voltage classes 1.2/0.9/0.7 V
+ * - NS-3 trace sources for Vcap, available energy and instantaneous efficiency
  */
 
 #ifndef PH_POWERCAST_ENERGY_HARVESTER_H
@@ -42,21 +32,16 @@ namespace energy
 {
 
 /**
- * @brief Advanced P21XXCSR Energy Harvester for 2.4GHz Wi-Fi Band
+ * @brief P21XXCSR-EVB energy harvester for the 2.4 GHz Wi-Fi band
  *
- * Production-grade RF energy harvesting device based on P21XXCSR-EVB Band 6 specifications
- * with advanced energy management, realistic efficiency modeling, and comprehensive safety
- * mechanisms for accurate wireless network simulation and large-scale deployment scenarios.
- *
- * Hardware Model: P21XXCSR-EVB Band 6 (2.4GHz Wi-Fi)
- * - Operating Frequency: 2.4 GHz (2400-2500 MHz, center: 2450 MHz)
- * - Input Power Range: -12 to +15 dBm (datasheet efficiency curve, clamped at +15 dBm)
- * - Boost Efficiency: 85% (from P21XXCSR-EVB datasheet specifications)
- * - Power Amplifier Efficiency: 90% (fixed for realistic transmission modeling)
- * - Energy Model: Advanced three-tier system (nominal/sunk/available energy)
- * - Safety Features: Deep discharge protection, overshoot protection, critical error detection
- * - Configuration: Three capacitor classes and three voltage threshold classes
- * - Validation: Pre-transmission energy checking and output enable status monitoring
+ * Hardware model: P21XXCSR-EVB Band 6
+ * - Operating frequency: 2.4 GHz (2400-2500 MHz, center 2450 MHz)
+ * - Input power range: -12 to +15 dBm (datasheet efficiency curve, clamped at +15 dBm)
+ * - Boost efficiency: 85% (datasheet)
+ * - PA / RF-chain efficiency on TX: 75%
+ * - Energy state: nominal / sunk (below DEEP_RATIO*Vmin) / available
+ * - Configuration: three capacitor classes x three voltage-threshold classes
+ * - Pre-TX energy audit (CanSustainTransmission) and output-enable status
  */
 class PowercastEnergyHarvester : public EnergyHarvester
 {
@@ -115,12 +100,10 @@ class PowercastEnergyHarvester : public EnergyHarvester
     static double GetCapacitorValue(CapacitorClass capClass);
 
     /**
-     * @brief Default constructor with P21XXCSR-EVB specifications and advanced energy model
+     * @brief Default constructor
      *
-     * Initializes harvester with default CLASS_A capacitor and CLASS_1 voltage (1.2V)
-     * thresholds. Capacitor values must be loaded from config file before use.
-     * Sets up advanced energy model with nominal/sunk/available energy separation
-     * and applies realistic 2.4GHz efficiency curve with comprehensive safety mechanisms.
+     * Starts with CLASS_A / CLASS_1 (1.2 V) placeholders and an empty capacitor.
+     * Capacitor values must be loaded from the config file and Configure() called before use; there is no fallback.
      */
     PowercastEnergyHarvester();
 
@@ -132,50 +115,38 @@ class PowercastEnergyHarvester : public EnergyHarvester
     // --- CORE ENERGY MANAGEMENT METHODS ---
 
     /**
-     * @brief Advanced RF Energy Harvesting with P21XXCSR-EVB Band 6 Modeling
+     * @brief Credit harvested RF energy to the capacitor
      *
-     * Converts received RF power at 2.4GHz to stored electrical energy using realistic
-     * efficiency curve based on P21XXCSR-EVB Band 6 datasheet characterization.
-     * Features input power clamping, overshoot protection, and advanced energy model
-     * with nominal/sunk/available energy separation for accurate simulation.
+     * Converts received RF power at 2.4 GHz to stored energy through the datasheet Band-6 efficiency curve and the boost-converter efficiency, then recomputes nominal/sunk/available energy.
      *
-     * @param rxPowerDbm Received RF power in dBm (processed through realistic efficiency curve)
-     * @param duration Signal reception duration for energy integration
+     * @param rxPowerDbm Received RF power in dBm
+     * @param duration Reception (harvest) duration
      *
-     * Efficiency Curve (P21XXCSR-EVB Band 6, 2450 MHz, 0.7 V datasheet trace):
+     * Efficiency curve (P21XXCSR-EVB Band 6, 2450 MHz, 0.7 V datasheet trace):
      * - Below -12 dBm: 0% (below the sensitivity floor)
      * - -12 to -5 dBm: 0% to ~40% (steep sensitivity-threshold rise)
      * - -5 to +8 dBm: ~40% to ~46% (gradual climb to the peak)
      * - +8 dBm and above: held at the ~46% peak (excess input attenuated to optimum)
      *
-     * Safety Features:
-     * - Input power clamping at +15 dBm to prevent hardware damage
-     * - Overshoot protection: voltage limited to 150% of Vmax
-     * - Energy state consistency: automatic nominal/sunk/available energy recalculation
+     * Limits:
+     * - Input power clamped at +15 dBm (hardware rating)
+     * - Vcap capped at SHOOT_RATIO*Vmax (= Vmax)
      */
     void SetHarvestedEnergy(double rxPowerDbm, Time duration);
 
     /**
-     * @brief Advanced Energy Consumption with Safety Validation and PA Modeling
+     * @brief Debit the DC energy of one transmission from the capacitor
      *
-     * Models energy drain during RF transmission with realistic 90% power amplifier
-     * efficiency and comprehensive safety checks to prevent unrealistic energy consumption
-     * that could lead to negative energy states or simulation inconsistencies.
+     * @param txPowerDbm Transmission power in dBm
+     * @param duration Transmission duration
      *
-     * @param txPowerDbm Transmission power in dBm (converted to DC energy requirements)
-     * @param duration Transmission duration for energy integration
+     * Energy model:
+     * - RF energy: E_RF = P * t
+     * - DC energy: E_DC = E_RF / PA_EFFICIENCY (0.75)
      *
-     * Safety Features:
-     * - Critical error detection: prevents energy consumption exceeding available energy
-     * - NS_FATAL_ERROR: forces simulation termination for debugging impossible energy states
-     * - 5% numerical tolerance: accounts for floating-point precision limitations
-     * - Comprehensive error logging: detailed information for debugging energy logic
-     * - Automatic energy state updates: maintains nominal/sunk/available energy consistency
-     *
-     * Energy Model:
-     * - RF Energy: Actual radiated power (E = P × t)
-     * - DC Energy: Total energy consumption including PA inefficiency (E_DC = E_RF / η_PA)
-     * - PA Efficiency: Fixed 90% based on P21XXCSR-EVB specifications
+     * CanSustainTransmission() should have approved the TX first.
+     * An over-draw that slips past it (e.g. an A-MPDU larger than the audited packet) is clamped at the DEEP_RATIO*Vmin floor with an NS_LOG_WARN rather than aborting the run.
+     * NS_FATAL_ERROR only if the harvester was never configured.
      */
     void SetConsumedEnergy(double txPowerDbm, Time duration);
 
@@ -230,7 +201,7 @@ class PowercastEnergyHarvester : public EnergyHarvester
     /**
      * @brief Get P21XXCSR-EVB Band 6 harvesting efficiency for given input power
      * @param rxPowerDbm Input power level for efficiency calculation
-     * @return Realistic 2.4GHz efficiency (0.0-0.85) at specified power level
+     * @return RF-to-DC efficiency (0.0 to ~0.46) at the given input power
      */
     double GetCurrentEfficiency(double rxPowerDbm) const;
 
@@ -249,22 +220,18 @@ class PowercastEnergyHarvester : public EnergyHarvester
      * - Calculates total DC energy required (including PA efficiency)
      * - Compares against current available energy
      * - Returns false if insufficient energy available
-     * - Provides comprehensive debug logging for energy decisions
+     * - Logs the shortfall at NS_LOG_DEBUG
      */
     bool CanSustainTransmission(double txPowerDbm, Time duration) const;
 
     /**
-     * @brief Check harvester output enable status with safety margins
+     * @brief Check harvester output enable status
      *
-     * Determines if the harvester can currently provide power based on dual
-     * safety criteria: available energy and voltage safety threshold.
+     * @return true if output is enabled (energy available AND Vcap >= DEEP_RATIO*Vmin)
      *
-     * @return true if output is enabled (energy available AND voltage above 80% Vmin)
-     *
-     * Safety Criteria:
-     * - Available Energy: Must be greater than 0 Joules
-     * - Voltage Safety: Must be above 80% of Vmin (deep discharge protection)
-     * - Deep Discharge Protection: Prevents capacitor damage from over-discharge
+     * Criteria:
+     * - Available energy greater than 0 J
+     * - Vcap at or above the DEEP_RATIO*Vmin floor (= Vmin), the same floor the TX audit and ComputePhase() use
      */
     bool IsOutputEnabled() const;
 
@@ -359,13 +326,13 @@ class PowercastEnergyHarvester : public EnergyHarvester
      * and the TX energy audit (which floors at DEEP_RATIO*Vmin).
      *
      * @return  3 = protection   (Vcap <= DEEP_RATIO*Vmin — at the hard floor; TX gated)
-     *          0 = critical-low (DEEP_RATIO*Vmin < Vcap < Vmin — alive, below nominal Vmin)
+     *          0 = critical-low (DEEP_RATIO*Vmin < Vcap < Vmin — alive, below nominal Vmin; empty while DEEP_RATIO = 1.0)
      *          2 = discharging  (Vmin <= Vcap < Vmax — healthy operating band)
      *          1 = active       (Vcap >= Vmax — fully charged / saturated)
      */
     uint8_t ComputePhase() const
     {
-        const double floorV = m_vmin * DEEP_RATIO; // hard floor (0.8*Vmin)
+        const double floorV = m_vmin * DEEP_RATIO; // hard floor (DEEP_RATIO*Vmin)
         if (m_vcap <= floorV)
         {
             return 3; // protection (at/below hard floor)
@@ -435,18 +402,19 @@ class PowercastEnergyHarvester : public EnergyHarvester
     // --- FIXED P21XXCSR-EVB PARAMETERS ---
 
     static const double BOOST_EFFICIENCY;    ///< Fixed 85% boost converter efficiency (datasheet)
-    static const double PA_EFFICIENCY;       ///< Fixed 90% power amplifier efficiency
+    static const double PA_EFFICIENCY;       ///< Fixed 75% PA / RF-chain efficiency
     static const double OPERATING_FREQUENCY; ///< Fixed 2450 MHz center frequency
     static const double
-        DEEP_RATIO; ///< Hard-floor ratio: Vcap may not drop below DEEP_RATIO*Vmin (0.8)
-    static const double SHOOT_RATIO; ///< Overshoot protection multiplier (1.5)
+        DEEP_RATIO; ///< Hard-floor ratio: Vcap may not drop below DEEP_RATIO*Vmin (1.0)
+    static const double
+        SHOOT_RATIO; ///< Harvest cap: Vcap may not rise above SHOOT_RATIO*Vmax (1.0)
 
     // --- DEVICE CONFIGURATION ---
 
     CapacitorClass m_capacitorClass; ///< Current capacitor class configuration
     VoltageClass m_voltageClass;     ///< Current voltage threshold class configuration
 
-    // --- ADVANCED ENERGY MODEL ---
+    // --- ENERGY STATE ---
 
     double m_availableEnergy;      ///< Usable energy for operations (J)
     double m_nominalEnergy;        ///< Total stored energy including sunk energy (J)

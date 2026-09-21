@@ -8,8 +8,8 @@
 """Rolling work-pool: dispatch-on-completion process pool for heterogeneous cores.
 
 The collector/orchestrator are batch-synchronous (spawn N, wait for ALL N), so on the
-DGX's big.LITTLE cores the batch is gated by whichever worker landed on a slow A725 core
-(see memory dgx-hardware-worker-tuning). This pool keeps `pool_size` slots busy and feeds
+DGX's big.LITTLE cores the batch is gated by whichever worker landed on a slow A725 core.
+This pool keeps `pool_size` slots busy and feeds
 the next work item to whichever slot frees first — fast X925 slots naturally pull more
 items, no per-batch barrier (only the tail when < pool_size items remain). No pinning.
 

@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# Author: Ahmed Maksud; email: ahmed.maksud@email.ucr.edu
+# PI: Marcelo Menezes De Carvalho; email: mmcarvalho@txstate.edu
+# Texas State University
+#
 # Script to install BsrManager into NS-3 WiFi module
 # This adds real-time BSR access for adaptive TWT control
 #
@@ -38,7 +43,7 @@ if [ ! -d "$NS3_ROOT/src/wifi" ]; then
     echo -e "${RED}ERROR: NS-3 directory structure not found!${NC}"
     echo "Expected to find: $NS3_ROOT/src/wifi"
     echo "Current directory: $SCRIPT_DIR"
-    echo "Please run this script from: contrib/ai/examples/MobiCom/twt/mod-files/"
+    echo "Please run this script from: contrib/ai/examples/rl-twt-powercast/mod-files/"
     exit 1
 fi
 
@@ -199,7 +204,7 @@ echo -e "${GREEN}========================================${NC}\n"
 
 echo -e "${YELLOW}Next steps:${NC}"
 echo "  1. Rebuild NS-3: ${GREEN}./ns3 build${NC}"
-echo "  2. Test with: ${GREEN}./ns3 run \"wns3-unilateral-twt --simId=10008\"${NC}"
+echo "  2. Test with: ${GREEN}./ns3 run \"twt-powercast-main-simulation\"${NC}"
 echo ""
 echo -e "${YELLOW}Backup files created:${NC}"
 [ -f "$WIFI_CMAKE.backup" ] && echo "  - $WIFI_CMAKE.backup"

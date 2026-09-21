@@ -7,12 +7,9 @@
 # PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
 
 # --- setup_fresh_ns3.sh ---
-# One-shot setup after dropping this repo into a FRESH ns-3.44 + ns3-ai checkout, under contrib/ai/examples/<ANY-NAME>/.
+# One-shot setup after dropping this repo into a FRESH ns-3.44 + ns3-ai checkout, under contrib/ai/examples/rl-twt-powercast/.
 #
-# The directory may be called anything (the git clone name, for instance): every
-# path in this project is derived at run time -- C++ from __FILE__, the shell
-# drivers from BASH_SOURCE, the Python from __file__ -- so nothing depends on a
-# particular folder name. This script registers whatever name you used.
+# The directory name is fixed (see the check below): twt-constants.h and CMakeLists.txt hardcode "rl-twt-powercast", so this script refuses to register any other name.
 #
 # It (1) applies the NS-3 source patches this project depends on (BSR manager
 # singleton + TWT agreement plumbing) and (2) registers the build subdir in the
@@ -20,6 +17,9 @@
 # build (see README.md's Build section). Idempotent (safe to re-run).
 #
 # Prereqs you provide: ns-3.44 source + the ns3-ai contrib module installed.
+#
+# Usage:
+#   bash contrib/ai/examples/rl-twt-powercast/setup_fresh_ns3.sh   # from the NS-3 root (any cwd works)
 set -e
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -59,13 +59,13 @@ fi
 cat <<'NEXT'
 
 ==> Patches applied + subdir registered. NEXT STEPS:
-    1) Create the venv:   python3.11 -m venv <NS3_ROOT>/../EHRL
-                          source <NS3_ROOT>/../EHRL/bin/activate
+    1) Create the venv:   python3.11 -m venv <NS3_ROOT>/../../EHRL
+                          source <NS3_ROOT>/../../EHRL/bin/activate
     2) Deps:              pip install -r requirements.txt
-                          (install torch for ARM64/CUDA — NOT a +cpu wheel)
+                          (the CPU build of torch is enough)
     3) Build:             see README.md "Build" — PIN an absolute Python3_EXECUTABLE
-                          to the venv python (the silent 3.x-relink trap). Verify:
-                          python -c "import pb_twt_powercast_interface_py"
-    4) Sanity test:       python3.11 ppo-sb3-scripts/twt_smoke_one_worker.py
-                          python3.11 ppo-sb3-scripts/twt_stress_test.py
+                          to the venv python (the silent 3.x-relink trap). Verify from the NS-3 root:
+                          PYTHONPATH=contrib/ai/examples/rl-twt-powercast python3.11 -c "import pb_twt_powercast_interface_py"
+    4) Sanity test:       python3.11 test-scripts/twt_smoke_one_worker.py
+                          python3.11 test-scripts/twt_stress_test.py
 NEXT

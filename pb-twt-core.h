@@ -1,3 +1,15 @@
+// Copyright (c) 2025 Texas State University
+//
+// SPDX-License-Identifier: GPL-2.0-only
+//
+// Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
+// PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
+
+/**
+ * @file pb-twt-core.h
+ * @brief Structs shared between C++ and Python over ns3-ai: realistic/oracle per-STA metrics, EnvStruct, ActionStruct
+ */
+
 #ifndef PB_TWT_CORE_H
 #define PB_TWT_CORE_H
 
@@ -62,7 +74,7 @@ struct StaRealisticMetrics
     // (link_margin_db stays: it is set = SNR, AP-measured.)
 
     // --- MAC LAYER OBSERVATIONS - AP observes from received frame headers ---
-    // NOTE: 0 indicates no observation yet for uint8_t fields
+    // 0 means no observation yet for the uint8_t fields
     uint8_t last_rx_frame_type;    // Frame type: 0=mgmt, 1=ctrl, 2=data
     uint8_t last_rx_frame_subtype; // Frame subtype (0-15)
     uint8_t last_rx_mcs;           // MCS index from last received frame (0-11 HE)
@@ -91,7 +103,7 @@ struct StaRealisticMetrics
 
     // --- QoS USER PRIORITY — AP reads the TID/UP directly from received QoS frames. ---
     // (device_class / nominal_msdu_size / mean_data_rate_kbps / delay_bound_ms were MOVED to StaOracleMetrics 2026-06-07.
-    //  The 3 TSPEC descriptors are realistic-*eligible* via 802.11e ADDTS and tx_power via 802.11h/k TPC, but this sim models none of that signaling (reads config); device_class has no standard signal at all and rule #25 keeps the AP blind to class — so all are oracle.)
+    //  The 3 TSPEC descriptors are realistic-*eligible* via 802.11e ADDTS and tx_power via 802.11h/k TPC, but this sim models none of that signaling (reads config); device_class has no standard signal at all and the AP is kept blind to class by design — so all are oracle.)
     uint8_t user_priority; // QoS UP (0-7) — AP reads it from received QoS frames
 
     // --- QoEH-REALISTIC INPUTS (AP-observable, for Quality of Energy Harvesting) ---
@@ -205,7 +217,7 @@ struct StaOracleMetrics
 
     // --- DEVICE CHARACTERISTICS — moved from realistic 2026-06-07 (signal audit) ---
 
-    // device_class: no standard signal (AP can only infer); rule #25 keeps AP blind.
+    // device_class: no standard signal (AP can only infer); the AP is kept class-blind by design.
     // The 3 TSPEC descriptors + tx_power are realistic-*eligible* (802.11e ADDTS / 802.11h-k TPC) but this sim reads them from config — so treated as oracle, ground-truth/reward-and-analysis only, NEVER in the observation.
     uint8_t device_class;       // 0=IoT,1=Camera,2=Voice,3=Video,4=REHD
     double nominal_msdu_size;   // Nominal MSDU size (802.11e TSPEC; config here)

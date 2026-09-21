@@ -5,6 +5,11 @@
 // Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
 // PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
 
+/**
+ * @file twt-metrics.cc
+ * @brief TwtMetrics implementation: BI-level and call-level logging and EnvStruct population
+ */
+
 #include "twt-metrics.h"
 
 #include "pb-twt-core.h"

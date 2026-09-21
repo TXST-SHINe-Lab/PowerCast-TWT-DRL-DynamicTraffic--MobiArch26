@@ -45,7 +45,7 @@ Architecture
         seeded by sched_embed(sched_idx), so temporal information reaches
         per-STA group decoding only through the schedule choice. This keeps
         the autoregressive decoder simple while giving the schedule + value
-        heads memory across the ~38 real steps of an episode.
+        heads memory across the real steps of an episode.
 
         The orchestrator's `_ppo_update_recurrent` path (the one that
         re-rolls hidden state from h_0=0 over a whole episode) is dispatched

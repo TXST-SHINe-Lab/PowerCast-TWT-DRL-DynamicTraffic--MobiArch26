@@ -9,17 +9,19 @@
 """EDA data collector for the QoEH TWT pipeline.
 
 Drives the NS-3 wrapper DIRECTLY (no policy) through a SYSTEMATIC sweep of the
-40x40x9 THREE-HEAD action space (schedule x assignment x PDW level) and logs
-EVERYTHING that feeds the model (the 18 obs features) and the reward (raw
-realistic+oracle metrics, per-step deltas, per-STA reward inputs, and the full
-reward breakdown) — one tidy row per (episode, update, STA) — to parquet shards
-for distribution analysis.
+THREE-HEAD action space (schedule x assignment x PDW level; 24 x 25 x 10 with the
+shipped tables, sizes read from them at import) and logs EVERYTHING that feeds the
+model (the 7 obs features) and the reward (raw realistic+oracle metrics, per-step
+deltas, per-STA reward inputs, and the full reward breakdown) — one tidy row per
+(episode, update, STA) — to parquet shards for distribution analysis.
 
-Systematic coverage: for global episode index g = round*num_workers + worker_id
-and update u, the action index is (g*UPDATES + u) mod 24000, decoded D-fastest
-(pdw = idx%15; assign = (idx//15)%40; sched = (idx//600)%40) so the PDW dimension
-is densely sampled and Δharvested responds per-update. Tiles the 24000-combo grid
-across the run (more episodes = denser coverage; ~3 visits/combo at 1000 eps).
+Systematic coverage, default mode: for global episode index g and update u, the
+action index is (g*UPDATES + u) mod GRID, decoded D-fastest (pdw = idx%N_PDW;
+assign = (idx//N_PDW)%N_ASSIGN; sched = (idx//(N_PDW*N_ASSIGN))%N_SCHED) so the PDW
+dimension is densely sampled and Δharvested responds per-update.
+EDA_SPAN=1 (what run_pipeline.sh sets) instead cycles each head with a coprime
+stride so every episode sweeps every value of every head (~33 visits/combo at
+2000 episodes x 100 updates).
 
 Run from the NS-3.44 root, EHRL venv. Spawn pattern mirrors the orchestrator
 (spawn workers per round, drain queue before join, workers os._exit(0)).
@@ -68,7 +70,7 @@ UPDATES = (
     100  # DURATION_IN_UPDATE (must match twt-constants.h; bumped 75->100 2026-06-01)
 )
 
-# SPAN mode (2026-06-07): for a SHORT EDA that still covers the whole action space, cycle each action dimension with a coprime stride so EVERY episode marginally sweeps all sched (period 30), all assign (stride 13, coprime to 25 -> all 25), all pdw (period 10), with a per-episode offset so workers decorrelate.
+# SPAN mode (2026-06-07): for a SHORT EDA that still covers the whole action space, cycle each action dimension with a coprime stride so EVERY episode marginally sweeps all sched (period N_SCHED), all assign (stride 13, coprime to 25 -> all 25), all pdw (period 10), with a per-episode offset so workers decorrelate.
 # (Sequential tiling only spans sched after ~240 eps.)
 EDA_SPAN = os.environ.get("EDA_SPAN", "0") == "1"
 EDA_SCALE = float(
@@ -203,7 +205,7 @@ def worker(
             if EDA_SPAN:
                 # coprime-cycle: each episode marginally sweeps ALL of each dimension
                 sched = (global_idx + u) % N_SCHED
-                assign = (global_idx * 7 + u * 13) % N_ASSIGN  # 13 coprime to 40
+                assign = (global_idx * 7 + u * 13) % N_ASSIGN  # 13 coprime to 25
                 pdw_idx = (global_idx * 3 + u) % N_PDW
             else:
                 idx = (global_idx * UPDATES + u) % GRID
@@ -323,7 +325,7 @@ def worker(
         status["err"] = f"{e}\n{traceback.format_exc()}"[:1500]
     finally:
         try:
-            result_queue.put(status)  # BEFORE close (rule #18)
+            result_queue.put(status)  # before close, so the feeder thread flushes it
         except Exception:
             pass
         try:
@@ -394,14 +396,12 @@ def main():
     os.makedirs(shard_dir, exist_ok=True)
     n_episodes = args.num_batches * args.num_workers
     upd = min(UPDATES, args.max_updates)
-    GET_TIMEOUT = (
-        900  # per-result wait; a full 75-step episode is ~3-6 min, so >15 min = hung
-    )
+    GET_TIMEOUT = 900  # per-result wait; a full 100-step episode takes a few minutes, so >15 min = hung
     print(f"[eda] out={out_dir}")
     print(
         f"[eda] {n_episodes} episodes, "
         f"{'variable 4-16 REHD' if args.variable_split else f'{args.n_stations}STA+{args.n_rehd}REHD'}, "
-        f"30x25x10 grid, {upd} updates/ep"
+        f"{N_SCHED}x{N_ASSIGN}x{N_PDW} grid, {upd} updates/ep"
     )
     print(
         f"[eda] grid coverage ~= {n_episodes * upd / GRID:.1f} visits/combo  "

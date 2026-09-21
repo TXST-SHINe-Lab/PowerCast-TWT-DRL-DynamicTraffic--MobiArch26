@@ -5,6 +5,11 @@
 // Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
 // PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
 
+/**
+ * @file twt-trace-callbacks.cc
+ * @brief NS-3 trace sinks for PHY state, MAC queues, BSR, AP RX/TX, and REHD harvesting
+ */
+
 #include "twt-trace-callbacks.h"
 
 #include "twt-simulation-config.h"

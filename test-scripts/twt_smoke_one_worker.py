@@ -50,9 +50,12 @@ def main():
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.dirname(script_dir)
+    ppo_dir = os.path.join(
+        parent_dir, "ppo-sb3-scripts"
+    )  # twt_models / twt_spawn_worker live there
     ns3_root = os.path.abspath(os.path.join(parent_dir, "..", "..", "..", ".."))
 
-    sys.path.insert(0, script_dir)
+    sys.path.insert(0, ppo_dir)
     sys.path.insert(0, parent_dir)
 
     # Build a fresh, untrained policy via the registry.
@@ -118,7 +121,7 @@ def main():
     t0 = time.time()
     p.start()
 
-    # Drain queue BEFORE join (wifi-simulation lesson #3)
+    # Drain the queue BEFORE join: a child blocked on a full queue pipe never exits
     print(f"[parent] Waiting for rollout (timeout 300s)...")
     try:
         result = q.get(timeout=300)
@@ -219,5 +222,7 @@ def main():
 
 
 if __name__ == "__main__":
-    mp.set_start_method("spawn")  # wifi-simulation lesson #4
+    mp.set_start_method(
+        "spawn"
+    )  # spawn, not fork: each worker starts a clean interpreter and imports the ns3-ai binding itself
     sys.exit(main())

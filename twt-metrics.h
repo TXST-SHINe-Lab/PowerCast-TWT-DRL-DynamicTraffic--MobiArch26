@@ -5,6 +5,11 @@
 // Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
 // PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
 
+/**
+ * @file twt-metrics.h
+ * @brief Per-BI and per-step metric collection, CSV logging, and EnvStruct packaging
+ */
+
 #ifndef TWT_METRICS_H
 #define TWT_METRICS_H
 

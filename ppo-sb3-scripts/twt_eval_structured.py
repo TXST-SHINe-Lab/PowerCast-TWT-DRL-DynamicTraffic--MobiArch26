@@ -297,7 +297,7 @@ def eval_worker(task, out_dir, result_q):
         status["err"] = f"{e}\n{traceback.format_exc()}"[:1500]
     finally:
         try:
-            result_q.put(status)  # BEFORE close (rule #18)
+            result_q.put(status)  # before close, so the feeder thread flushes it
         except Exception:
             pass
         try:

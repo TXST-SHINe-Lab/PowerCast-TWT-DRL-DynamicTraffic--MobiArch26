@@ -1,0 +1,46 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="beacon_interval" id="bi-1">
+    <mxGraphModel dx="665" dy="374" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="600" pageHeight="190" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="bar" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;fontSize=14;fontStyle=1" value="" vertex="1">
+          <mxGeometry height="45" width="480" x="40" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="beaconL" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontSize=14;fontStyle=1" value="" vertex="1">
+          <mxGeometry height="45" width="16" x="40" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="beaconR" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontSize=14;fontStyle=1" value="" vertex="1">
+          <mxGeometry height="45" width="16" x="520" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="pdw" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1" value="PDW (T&lt;sub&gt;pdw&lt;/sub&gt;)" vertex="1">
+          <mxGeometry height="45" width="109" x="57" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="sp1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1" value="SP&lt;sub&gt;1&lt;/sub&gt;" vertex="1">
+          <mxGeometry height="45" width="96" x="178" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="sp2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1" value="SP&lt;sub&gt;2&lt;/sub&gt;" vertex="1">
+          <mxGeometry height="45" width="84" x="286" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="sp3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1" value="SP&lt;sub&gt;3&lt;/sub&gt;" vertex="1">
+          <mxGeometry height="45" width="72" x="382" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="cont" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f0f0f0;strokeColor=#999999;fontSize=14;fontStyle=1" value="T&lt;sub&gt;res&lt;/sub&gt;" vertex="1">
+          <mxGeometry height="45" width="54" x="466" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="lblBeaconL" parent="1" style="text;html=1;align=center;fontSize=14;fontStyle=1" value="beacon" vertex="1">
+          <mxGeometry height="16" width="52" x="22" y="51" as="geometry" />
+        </mxCell>
+        <mxCell id="lblBeaconR" parent="1" style="text;html=1;align=center;fontSize=14;fontStyle=1" value="beacon" vertex="1">
+          <mxGeometry height="16" width="52" x="502" y="51" as="geometry" />
+        </mxCell>
+        <mxCell id="biArrow" edge="1" parent="1" style="endArrow=classic;startArrow=classic;html=1;strokeColor=#000000;fontSize=14;labelBackgroundColor=#ffffff;fontStyle=1" value="T&lt;sub&gt;BI&lt;/sub&gt; = 102.4 ms">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="41" y="150" as="sourcePoint" />
+            <mxPoint x="519" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

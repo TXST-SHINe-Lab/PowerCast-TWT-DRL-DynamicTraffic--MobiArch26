@@ -5,6 +5,11 @@
 // Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
 // PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
 
+/**
+ * @file twt-simulation-config.cc
+ * @brief Network setup: heterogeneous 802.11ax cell, REHD harvesting, dynamic traffic and mobility, TWT + PDW application
+ */
+
 #include "twt-simulation-config.h"
 
 #include "ph-deployment-helper.h" // PowercastEnergyHarvesterHelper (phase 1)
@@ -117,7 +122,7 @@ ResolveStaIdx(uint32_t nodeId, uint32_t& staIdx)
 
 // Reconcile a REHD's uplink queue block with its energy audit.
 // Call after any capacitor update (consume / idle drain / harvest).
-// No hysteresis: the gate is simply "can the cap pay for one more packet (staying >= 0.8*Vmin)?":
+// No hysteresis: the gate is simply "can the cap pay for one more packet (staying >= DEEP_RATIO*Vmin = Vmin)?":
 //   - can't afford & not locked  → lock + BLOCK uplink queue (packets wait)
 //   - can afford   & locked       → unlock + UNBLOCK (drain as many as energy allows)
 // So a depleted REHD unblocks the instant it harvests one packet's worth — and the MAC then drains greedily until the next packet is unaffordable (re-block in the following OnPhyTxEnd).
@@ -801,7 +806,7 @@ TwtNetworkSetup::ConfigureWifi()
     streamNumber += wifi.AssignStreams(staDevices, streamNumber);
 
     // WiFi 6 Guard Interval Configuration (802.11ax)
-    // NOTE: This is SINGLE-USER mode (NOT OFDMA):
+    // This is SINGLE-USER mode (not OFDMA):
     //   - ConstantRateWifiManager: Fixed MCS per device, one at a time
     //   - TWT implicit: Non-overlapping Service Periods ensure no collisions
     //   - Result: Only ONE STA transmits during its SP window
@@ -1047,10 +1052,10 @@ TwtNetworkSetup::SetupApplications()
     uint16_t port = 50000;
 
     // PER-CLASS PACKET LIFETIME (2026-06-07): set each STA's UL queue MaxDelay to its class deadline (= latency_requirement, also exposed as the oracle delay_bound).
-    // Distinct per class — Voice 200 / Video 400 / Camera 600 ms, IoT 2 s, REHD 5 s — sized achievable-but-tight under TWT (>=~1.5 BI), so a GOOD schedule meets them while a BAD one expires the tight ones.
+    // Distinct per class — IoT 500 ms, Voice 1 s, Camera 2 s, Video 3 s, REHD 200 ms — so a GOOD schedule meets them while a BAD one expires the tight ones.
     // Overrides the global 1000 ms default.
     // A tight-deadline STA served late -> its packets EXPIRE -> the class-blind expiry term guides the agent to serve it promptly (latency-as-expiry proxy).
-    // REHDs expire only on a long energy lockout.
+    // REHDs have the tightest deadline, so an energy lockout longer than 200 ms expires their backlog.
     for (std::size_t i = 0; i < m_config.nTotal(); i++)
     {
         Ptr<WifiNetDevice> dev = DynamicCast<WifiNetDevice>(wifiStaNodes.Get(i)->GetDevice(0));
@@ -2253,7 +2258,7 @@ TwtNetworkSetup::SetupEnergyHarvesting(const std::string& configFile)
         g_rehdPhy[sta_idx] = rehdDev ? rehdDev->GetPhy() : nullptr;
         g_rehdMac[sta_idx] = rehdDev ? rehdDev->GetMac() : nullptr;
         g_rehdMob[sta_idx] = rehdNodes.Get(j)->GetObject<MobilityModel>();
-        // REHD uplink buffer: extend MaxDelay to 10 s (vs 500 ms default) so packets survive an energy lockout, and hook the "Expired" trace to count drops (oracle metric).
+        // REHD uplink buffer: MaxDelay = the REHD deadline (200 ms), and hook the "Expired" trace to count drops (oracle metric).
         // Per AC queue.
         if (g_rehdMac[sta_idx])
         {
@@ -2262,8 +2267,8 @@ TwtNetworkSetup::SetupEnergyHarvesting(const std::string& configFile)
                 Ptr<WifiMacQueue> q = g_rehdMac[sta_idx]->GetTxopQueue(ac);
                 if (q)
                 {
-                    // REHD class deadline (5 s) — same as the unified per-class MaxDelay loop in SetupApplications (which also sets this); kept here with the Expired trace binding.
-                    // (Was 10 s; now couples energy lockout to data-survival.)
+                    // REHD class deadline (200 ms) — same as the unified per-class MaxDelay loop in SetupApplications (which also sets this); kept here with the Expired trace binding.
+                    // (Was 10 s; now couples energy lockout to data survival.)
                     q->SetMaxDelay(m_config.sta_app_configs[sta_idx].latency_requirement);
                     q->TraceConnectWithoutContext("Expired",
                                                   MakeBoundCallback(&::OnRehdExpired, sta_idx));

@@ -7,10 +7,10 @@
 # PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
 
 """
-twt_models/mlp_ppo.py - MLP PPO policy with two independent Categorical heads.
+twt_models/mlp_ppo.py - MLP PPO policy with three independent Categorical heads.
 
-Action space: MultiDiscrete([num_schedules, num_assignments])  (default 40 x 40)
-Observation:  Box(obs_dim,)                                     (default 288 = 16 x 18)
+Action space: MultiDiscrete([num_schedules, num_assignments, num_pdw_levels])  (24 x 25 x 10 with the shipped tables)
+Observation:  Box(obs_dim,)  (num_sta x 7; sized per topology by twt_spawn_worker.default_obs_kwargs)
 
 Architecture (faithful port of legacy train_ppo_V1.py, which used SB3's
 PPO with a custom EnhancedFeatureExtractor + net_arch=dict(pi=[256,256],
@@ -28,6 +28,7 @@ vf=[256,256]) + activation_fn=GELU + ortho_init=True):
     heads:
         schedule_head    = Linear(256, num_schedules)
         assignment_head  = Linear(256, num_assignments)
+        pdw_head         = Linear(256, num_pdw_levels)
         value_head       = Linear(256, 1)
 
 All Linear weights use orthogonal init with gain sqrt(2); biases are zero.
@@ -61,10 +62,10 @@ class MlpPpoPolicy(BasePolicy):
     ):
         """
         Args:
-            obs_dim:        observation length (288 = 16 STAs * 18 features).
+            obs_dim:        observation length (num_sta * 7 features).
             num_schedules:  size of the schedule action head.
             num_assignments size of the assignment action head.
-            num_pdw_levels: size of the PDW action head (pdw_end in {5,10,...,75} -> 15).
+            num_pdw_levels: size of the PDW action head (pdw_end in {5,10,...,50} -> 10 with the shipped decoder).
             hidden_dim:     convenience knob; if features_dim/net_arch are not
                             given, both default to (hidden_dim, [hidden_dim]*2).
             features_dim:   output dim of the feature extractor (defaults to hidden_dim).

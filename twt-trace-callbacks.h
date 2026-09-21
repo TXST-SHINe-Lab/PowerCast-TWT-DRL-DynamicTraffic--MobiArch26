@@ -5,6 +5,11 @@
 // Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
 // PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
 
+/**
+ * @file twt-trace-callbacks.h
+ * @brief Trace-sink declarations and the per-STA accumulator arrays they fill
+ */
+
 #ifndef TWT_TRACE_CALLBACKS_H
 #define TWT_TRACE_CALLBACKS_H
 
@@ -212,7 +217,7 @@ void ApPhyRxEndTrace(std::string context,
                      const std::vector<bool>& perMpduStatus);
 void ApPhyRxDropTrace(std::string context, Ptr<const WifiPsdu> psdu, WifiPhyRxfailureReason reason);
 
-// NEW: AP Monitor Sniffer RX callback - matches MonitorSnifferRx signature in NS-3.44
+// AP Monitor Sniffer RX callback - matches MonitorSnifferRx signature in NS-3.44
 void ApMonitorSnifferRxTrace(std::string context,
                              Ptr<const Packet> packet,
                              uint16_t channelFreqMhz,
@@ -221,7 +226,7 @@ void ApMonitorSnifferRxTrace(std::string context,
                              SignalNoiseDbm signalNoise,
                              uint16_t staId);
 
-// NEW: AP PHY RX Drop callback (simplified) - matches PhyRxDrop signature in NS-3.44
+// AP PHY RX Drop callback (simplified) - matches PhyRxDrop signature in NS-3.44
 void ApPhyRxDropTraceSimple(std::string context,
                             Ptr<const Packet> packet,
                             WifiPhyRxfailureReason reason);

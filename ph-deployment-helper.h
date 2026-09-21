@@ -7,23 +7,14 @@
 
 /**
  * @file ph-deployment-helper.h
- * @brief Advanced PowerCast Deployment Helper
+ * @brief PowercastEnergyHarvesterHelper: install PowerCast harvesters on many nodes from a config file or template
  *
- * Production-grade helper class for large-scale deployment of PowerCast energy harvesters
- * with comprehensive file-based configuration, template management, and flexible assignment
- * methods for automated deployment scenarios. Supports statistical tracking, validation,
- * and export capabilities for enterprise-level wireless network simulation projects.
+ * SetupEnergyHarvesting() in twt-simulation-config.cc installs the REHD harvesters through it, overriding each node's classes with ConfigureNode() from REHD_TYPE_TEMPLATES.
  *
- * Key Features:
- * - File-based configuration system for automated large-scale deployment
- * - Multiple deployment templates (uniform, mixed, high-capacity, low-power)
- * - Flexible assignment methods (sequential, random, file-based, manual)
- * - Comprehensive configuration validation and error handling
- * - Statistical tracking and reporting for deployment analysis
- * - Export functionality for configuration management and documentation
- * - Template-based configuration with P21XXCSR-EVB specifications
- * - Per-node customization with fallback methods for unknown configurations
- * - Integration with advanced PowerCast energy model (nominal/sunk/available energy)
+ * - Reads "NodeID CapacitorClass VoltageClass" lines (see ph-harvester-config.txt)
+ * - Deployment templates: uniform, mixed, high-capacity, low-power
+ * - Assignment methods for unlisted nodes: sequential, random, file-based, manual
+ * - Per-node overrides, configuration validation, statistics and export
  */
 
 #ifndef EHN_POWERCAST_ENERGY_HARVESTER_HELPER_H
@@ -46,10 +37,9 @@ namespace energy
 {
 
 /**
- * @brief Enhanced Helper for File-Based PowercastEnergyHarvester Deployment
+ * @brief Helper for file-based PowercastEnergyHarvester deployment
  *
- * Advanced helper class supporting large-scale deployment of PowercastEnergyHarvester
- * instances with file-based configuration system. Enables reading capacitor and
+ * Installs PowercastEnergyHarvester instances with a file-based configuration system. Enables reading capacitor and
  * voltage class specifications from external configuration files for automated
  * deployment scenarios where node characteristics are predefined.
  *

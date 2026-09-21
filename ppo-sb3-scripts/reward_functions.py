@@ -140,7 +140,7 @@ PRESET_WEIGHTS = {
         "queue": 0.20,  # SECONDARY (queue affects throughput)
         "drops": 0.15,  # SECONDARY (drops = lost throughput)
         "energy": 0.10,  # TERTIARY
-        "airtime": 0.15,  # NEW: Penalize long TWT schedules
+        "airtime": 0.15,  # Penalize long TWT schedules
         "channel": 0.05,  # TERTIARY
     },
     "energy": {
@@ -148,7 +148,7 @@ PRESET_WEIGHTS = {
         "throughput": 0.20,  # SECONDARY (need some throughput)
         "drops": 0.10,  # SECONDARY (retx waste energy)
         "queue": 0.10,  # TERTIARY
-        "airtime": 0.20,  # NEW: Shorter schedules save energy
+        "airtime": 0.20,  # Shorter schedules save energy
         "channel": 0.05,  # TERTIARY
     },
     "queue": {
@@ -156,7 +156,7 @@ PRESET_WEIGHTS = {
         "drops": 0.20,  # SECONDARY (drops = queue overflow)
         "throughput": 0.20,  # SECONDARY (need TX to drain)
         "energy": 0.10,  # TERTIARY
-        "airtime": 0.10,  # NEW: Shorter schedules = lower latency
+        "airtime": 0.10,  # Shorter schedules = lower latency
         "channel": 0.05,  # TERTIARY
     },
 }
@@ -1927,11 +1927,11 @@ class TwtPfDemandV1RewardFunction:
 # v1 ranked a STARVING action (serves 40%, drops 64%) ABOVE one serving ~all.
 # v2:
 #   - served is LINEAR and DOMINANT (serving more always pays clearly).
-#   - explicit expiry (drop_rate) penalty = the user's "minimize expiry" objective (captures deadline misses specifically, distinct from still-queued packets).
+#   - explicit expiry (drop_rate) penalty = the "minimize expiry" objective (captures deadline misses specifically, distinct from still-queued packets).
 #   - sharp worst-STA anti-starvation max(1-served)^2 (kept from v1).
 #   - SMALL linear airtime-occupancy efficiency cost: in UNDER segments (where a medium schedule fully serves) it makes the agent pick the cheapest-sufficient schedule; in OVER segments serving more still wins (served weight >> airtime).
 #   - excess_duty term REMOVED (occupancy already prices resource use; duty double-counted it and dominated).
-# Intrinsic [0,1] ratios, linear costs (rule #17).
+# Intrinsic [0,1] ratios, linear costs.
 # Class-blind.
 # `action` accepted but UNUSED (airtime = MEASURED occupancy, like v1's 2026-06-04 fix).
 _PF_V2_STEP_US = (
@@ -2033,15 +2033,15 @@ class TwtPfDemandV2RewardFunction:
 
 
 # --- twt_pf_demand_v3 — MULTI-OBJECTIVE TRADEOFF reward (served + latency + expiry + REHD-energy sustainability + fairness + efficiency) ---
-# WHY (2026-06-05, user-directed): the project objective is a *learnable, state-dependent TRADEOFF* across ALL aspects, not throughput alone.
+# Why (2026-06-05): the project objective is a *learnable, state-dependent TRADEOFF* across ALL aspects, not throughput alone.
 # v1/v2 captured only served/expiry/airtime.
-# v3 adds the two dimensions the user named:
+# v3 adds the two missing dimensions:
 #   (1) LATENCY — clear every STA's buffer with the lowest sojourn possible. Uses the REAL MAC queue-sojourn time (wired 2026-06-05: `step_latency_ms`), uniform across ALL STAs (no priority classes — every buffer matters equally).
 #   (2) REHD ENERGY sustainability — REHDs are fragile RF-harvesters; reward keeping harvest >= consumption (H/C -> 1, the *controllable* energy lever: grouping lets REHDs sleep->harvest, ~2x H/C in tests). REHD-only by nature (vcap_max>0); SELF-ZEROS for non-REHDs (no harvester => no consumption) => stays class-blind.
 # Uniform importance: REHD protection EMERGES from (a) uniform expiry/served on the worst contributors (REHDs starve most under a big shared SP) + (b) the REHD-only energy dimension — NOT from a class weight.
 # Efficiency / anti-contention ("energy lost in wasteful contention") is priced by the measured-airtime occupancy cost.
 #
-# ALL terms are intrinsic [0,1] ratios, linear (rule #17), class-blind.
+# All terms are intrinsic [0,1] ratios, linear, class-blind.
 # EVERY weight (incl. LAT_DEADLINE_MS, DEMAND_FLOOR, MV_WORST_FRAC) is overridable via the `weights` arg so the EDA / fixed-policy sweeps can re-tune the tradeoff.
 # Defaults below are STARTING points, not final.
 #
@@ -2212,7 +2212,7 @@ class TwtPfDemandV3RewardFunction:
 # v4 replaces the mean with an α-FAIR (NUM / Nash) aggregation of a per-STA utility — the principled fairness objective (Kelly NUM 1998; Mo & Walrand α-fairness 2000).
 # α=1 ⇒ proportional-fair / Nash social welfare.
 #
-# The CONCAVITY of U_α IS the user-requested "soft-but-steep" penalty: U_α(q) is gentle near q=1 and steep as q→0, so a starved / deadline-missing STA is sharply but SMOOTHLY penalized — no hard hinge, no class weighting.
+# The CONCAVITY of U_α IS the intended "soft-but-steep" penalty: U_α(q) is gentle near q=1 and steep as q→0, so a starved / deadline-missing STA is sharply but SMOOTHLY penalized — no hard hinge, no class weighting.
 #
 # Per-STA utility (class-blind, intrinsic [0,1]):
 #   q_i = served_i * (1 - loss_i)
@@ -2387,7 +2387,7 @@ _PF_V5_DEFAULTS = dict(_PF_V4_DEFAULTS)
 _PF_V5_DEFAULTS.update(
     {
         "w_eng": 0.0,  # keep v4q's QoS-only stance; REHD energy now priced by expiry
-        "w_rehd_exp": 0.5,  # NEW: REHD expiry penalty weight (oracle, self-zeros non-REHD)
+        "w_rehd_exp": 0.5,  # REHD expiry penalty weight (oracle, self-zeros non-REHD)
         "shrink_m": 3.0,  # Bayesian pseudo-count (was the hard demand_floor=3)
         "shrink_p0": 1.0,  # served prior at zero demand (1 = assume satisfied; loss prior = 0)
     }

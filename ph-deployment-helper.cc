@@ -7,21 +7,11 @@
 
 /**
  * @file ph-deployment-helper.cc
- * @brief Advanced PowerCast Deployment Helper Implementation
+ * @brief PowercastEnergyHarvesterHelper implementation
  *
- * Production-grade implementation for large-scale deployment of PowerCast RF energy harvesters
- * with comprehensive file-based configuration management, template deployment strategies, and
- * flexible assignment algorithms. This helper integrates seamlessly with the advanced PowerCast
- * energy model (nominal/sunk/available energy) and provides enterprise-level capabilities for
- * automated wireless network simulation projects with statistical tracking and validation.
- *
- * Implementation Features:
- * - Robust file parsing with comprehensive error handling and validation
- * - Multiple deployment templates optimized for different simulation scenarios
- * - Statistical tracking for deployment analysis and configuration optimization
- * - Configuration export functionality for documentation and repeatability
- * - Seamless integration with P21XXCSR-EVB specifications and safety mechanisms
- * - Advanced error recovery and fallback strategies for unknown node configurations
+ * - Config-file parsing with per-line validation
+ * - Deployment templates and assignment methods for nodes without an explicit entry
+ * - Deployment statistics and configuration export
  */
 #include "ph-deployment-helper.h"
 

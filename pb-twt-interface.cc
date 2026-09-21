@@ -5,6 +5,11 @@
 // Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
 // PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
 
+/**
+ * @file pb-twt-interface.cc
+ * @brief pybind11 module pb_twt_powercast_interface_py exposing the pb-twt-core.h structs to Python
+ */
+
 #include "pb-twt-core.h"
 #include "twt-simulation-config.h"
 

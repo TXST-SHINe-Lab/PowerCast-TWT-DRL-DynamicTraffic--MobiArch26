@@ -729,7 +729,7 @@ class TWTWrapper:
 
             self.msgInterface = self.exp.run(
                 setting=run_setting,
-                show_output=True,  # MUST be True: show_output=False causes a 64KB pipe-buffer deadlock when C++ has lots of stdout (see wifi-simulation/parallelization-lessons.md)
+                show_output=True,  # Must be True: show_output=False causes a 64 KB pipe-buffer deadlock once the C++ side writes enough stdout
             )
 
             self.initialized = True

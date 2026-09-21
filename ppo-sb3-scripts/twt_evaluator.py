@@ -132,7 +132,7 @@ def parse_args():
         action="store_true",
         default=False,
         help="Sample (n_stations, n_rehd) per-episode via twt_scenario.sample_split(seed) "
-        "(total fixed at 20, n_rehd~U[4,16]) -- must match training (rule #28)",
+        "(total fixed at 20, n_rehd~U[4,16]) -- must match training",
     )
     p.add_argument(
         "--non-deterministic",
@@ -188,7 +188,7 @@ def load_policy_payload(arg: str, n_total: int = 0) -> Tuple[bytes, str, dict, s
         n_total: active STA count (n_stations + n_rehd). For REGISTRY baselines
             (no embedded kwargs) the obs shape is auto-sized from this so they
             match the eval topology. Checkpoints carry their own kwargs (already
-            sized to their training topology — rule #28: eval must match train).
+            sized to their training topology — eval must match train).
 
     Returns:
         (payload_bytes, display_name, kwargs, source_kind)
@@ -272,7 +272,7 @@ def evaluate_policy(
             p.start()
             workers.append(p)
 
-        # Drain BEFORE join (lesson #3)
+        # Drain BEFORE join: a child blocked on a full queue pipe never exits
         results = []
         for _ in range(this_batch):
             try:

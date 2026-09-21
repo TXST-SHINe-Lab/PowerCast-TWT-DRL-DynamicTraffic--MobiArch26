@@ -7,10 +7,10 @@
 # PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
 
 """
-twt_models/lstm_ppo.py - LSTM-PPO policy with two independent Categorical heads.
+twt_models/lstm_ppo.py - LSTM-PPO policy with three independent Categorical heads.
 
-Action space: MultiDiscrete([num_schedules, num_assignments])  (default 40 x 40)
-Observation:  Box(obs_dim,)                                     (default 288 = 16 x 18)
+Action space: MultiDiscrete([num_schedules, num_assignments, num_pdw_levels])  (24 x 25 x 10 with the shipped tables)
+Observation:  Box(obs_dim,)  (num_sta x 7; sized per topology by twt_spawn_worker.default_obs_kwargs)
 
 Architecture (port of legacy train_lstm_ppo_V1.py, which used sb3-contrib's
 RecurrentPPO with policy="MlpLstmPolicy" and policy_kwargs:
@@ -28,6 +28,7 @@ RecurrentPPO with policy="MlpLstmPolicy" and policy_kwargs:
     heads:
         schedule_head    = Linear(256, num_schedules)
         assignment_head  = Linear(256, num_assignments)
+        pdw_head         = Linear(256, num_pdw_levels)
         value_head       = Linear(256, 1)
 
 Note on activation: the legacy RecurrentPPO used the SB3 default

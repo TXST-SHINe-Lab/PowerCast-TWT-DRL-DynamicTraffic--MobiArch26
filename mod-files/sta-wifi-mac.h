@@ -6,6 +6,10 @@
  *
  * Authors: Mathieu Lacage <mathieu.lacage@sophia.inria.fr>
  *          Mirko Banchi <mk.banchi@gmail.com>
+ *
+ * Modified by: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
+ *              Texas State University
+ *              Added GetTimeTillNextBeacon() for TWT schedule offset calculation
  */
 
 #ifndef STA_WIFI_MAC_H
@@ -288,21 +292,20 @@ class StaWifiMac : public WifiMac
      * @param linkId the ID of the link used to establish association
      */
     void SetPmModeAfterAssociation(uint8_t linkId);
-
+    
     /**
-     * Placeholder function scheduled at next expected beacon generation time at AP - used to
-     * calculate TWT schedules
-     *
+     * Placeholder function scheduled at next expected beacon generation time at AP - used to calculate TWT schedules
+     * 
      */
-    void NextExpectedBeaconGeneration();
-
+    void NextExpectedBeaconGeneration ();
+    
     /**
-     * Sleep or wake up PHY for all links
+     * Sleep or wake up PHY for all links 
      * For sleeping, ongoing frame exchange is completed first
-     *
+     * 
      * @param enable Sleep if set if true, wake if set to false
      */
-    void SetPhySleepState(bool enable);
+    void SetPhySleepState (bool enable);
 
     /**
      * Notify that the MPDU we sent was successfully received by the receiver

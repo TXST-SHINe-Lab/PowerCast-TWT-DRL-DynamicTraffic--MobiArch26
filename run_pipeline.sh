@@ -8,11 +8,12 @@
 
 # --- run_pipeline.sh: ONE driver for the full TWT-PowerCast experiment, end-to-end ---
 #
+#   STAGE 0  action tables ........... generate_action_tables.py (RUN_TABLES)
 #   STAGE 1  harvest/Vcap plots ...... show RF energy harvesting is happening
 #   STAGE 2  full EDA + obs norms ..... fit signal-normalization params (prompts
 #                                       before overwriting obs_warmstart_stats.json)
 #   STAGE 3  full training ............ lstm_ppo + asymmetric critic, v5 reward
-#   STAGE 4  full evaluation .......... trained policy vs fixed/random/analytical
+#   STAGE 4  full evaluation .......... trained policy vs the analytical_md1 baseline, per device class
 #
 # This does NOT do environment setup (NS-3 patches, cmake, build) — that lives in
 # setup_fresh_ns3.sh and must already be done (the pybind .so must import).
@@ -22,7 +23,7 @@
 #
 # Knobs (env vars, with full-run defaults). Examples:
 #   RUN_TRAIN=0 RUN_EVAL=0 bash run_pipeline.sh          # just plots + EDA
-#   TRAIN_BATCHES=10 EDA_BATCHES=3 bash run_pipeline.sh  # quick smoke of all 4 stages
+#   TRAIN_BATCHES=10 EDA_BATCHES=3 bash run_pipeline.sh  # quick smoke of every stage
 #   NORMS_MODE=skip bash run_pipeline.sh                 # never touch the live obs norms
 #   RUN_PLOT=0 RUN_EDA=0 RUN_TRAIN=0 bash run_pipeline.sh                 # eval-only,
 #       falls back to the newest shipped run's ckpt_final.pt under results/
@@ -36,8 +37,8 @@ VENV="${VENV:-$(cd "$NS3_ROOT/../.." && pwd)/EHRL}" # default: $NS3_ROOT/../../E
 PY="$VENV/bin/python3.11"
 SCRIPTS="$PROJ/ppo-sb3-scripts"
 TS="$(date +%Y%m%d_%H%M%S)"
-RESULTS="$PROJ/results"                            # SINGLE generated-output root
-RUN_ROOT="${RUN_ROOT:-$RESULTS/runs/pipeline_$TS}" # override so callers (reproduce.sh) can locate outputs
+RESULTS="$PROJ/results"                                # SINGLE generated-output root
+RUN_ROOT="${RUN_ROOT:-$RESULTS/runs/run_$TS/pipeline}" # same run_<timestamp>/pipeline layout as reproduce.sh; override so callers can locate outputs
 
 # --- stage toggles ---------------------------------------------------------
 RUN_TABLES="${RUN_TABLES:-1}"
@@ -50,7 +51,7 @@ RUN_EVAL="${RUN_EVAL:-1}"
 NSTA="${NSTA:-12}"
 NREHD="${NREHD:-8}"
 REWARD="${REWARD:-twt_pf_demand_v5}"
-MAX_STEPS="${MAX_STEPS:-100}" # rollout/eval horizon (train & eval MUST match — rule #11)
+MAX_STEPS="${MAX_STEPS:-100}" # rollout/eval horizon (train and eval must match; a 100-step policy collapses at a shorter horizon)
 
 # --- stage 1 (Vcap/harvest diagnostic) -------------------------------------
 VCAP_NSTA="${VCAP_NSTA:-10}"
@@ -185,7 +186,7 @@ fi
 # --- STAGE 3 — full training (lstm_ppo + asymmetric critic, v5 reward) ---
 if [ "$RUN_TRAIN" = "1" ]; then
     banner "STAGE 3/5 — training ($TRAIN_BATCHES batches, $TRAIN_WORKERS workers)"
-    # NOTE: no explicit --policy-kwargs here — num_schedules/num_assignments/num_pdw_levels are
+    # No explicit --policy-kwargs here — num_schedules/num_assignments/num_pdw_levels are
     # auto-derived from the carved action tables (twt_spawn_worker.default_obs_kwargs); a stale
     # hardcoded override (e.g. num_schedules:25 vs the actual carved 24) would silently mis-size
     # the policy.

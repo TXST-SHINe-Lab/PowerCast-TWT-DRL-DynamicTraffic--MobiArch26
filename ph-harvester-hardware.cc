@@ -7,24 +7,13 @@
 
 /**
  * @file ph-harvester-hardware.cc
- * @brief Advanced PowerCast RF Energy Harvester Implementation
+ * @brief PowerCast P21XXCSR-EVB RF energy harvester implementation
  *
- * Implementation of a production-grade RF energy harvesting device based on P21XXCSR-EVB
- * Band 6 specifications with advanced energy management, safety mechanisms, and realistic
- * 2.4GHz efficiency modeling for accurate wireless network simulations.
- *
- * Key Features:
- * - Advanced energy model with nominal/sunk/available energy separation
- * - Realistic 2.4GHz efficiency curve based on P21XXCSR-EVB Band 6 datasheet
- * - Input power clamping at +15 dBm maximum rating with proper sensitivity handling
- * - Fixed 85% boost-converter efficiency (datasheet); 75% PA / RF-chain efficiency
- * - Deep discharge protection with configurable safety ratios
- * - Overshoot protection with voltage limiting at 1.5× Vmax
- * - Critical error detection for unrealistic energy consumption scenarios
- * - Pre-transmission energy checking with CanSustainTransmission() method
- * - Comprehensive safety mechanisms with NS_FATAL_ERROR for debugging
- * - Three-class capacitor system: configurable Class A, B, C (values loaded from config file)
- * - Three-voltage threshold system: 1.2V, 0.9V, 0.7V operation modes
+ * - Band-6 efficiency curve digitized from the datasheet, linear interpolation between points
+ * - 85% boost-converter efficiency on harvest, 75% PA / RF-chain efficiency on TX
+ * - Strict two-threshold capacitor (DEEP_RATIO = SHOOT_RATIO = 1.0): Vcap stays in [Vmin, Vmax]
+ * - An over-draw that slips past CanSustainTransmission() is clamped at the floor with a warning, not a fatal error
+ * - NS_FATAL_ERROR if the harvester is used before Configure(), or with a capacitor class whose value was never loaded
  */
 
 #include "ph-harvester-hardware.h"
@@ -113,7 +102,7 @@ PowercastEnergyHarvester::GetTypeId()
     return tid;
 }
 
-// Constructor with advanced energy model initialization
+// Constructor: empty capacitor, placeholder classes until Configure()
 PowercastEnergyHarvester::PowercastEnergyHarvester()
       : m_vcap(0.0)
       , // Will be set after explicit configuration
@@ -143,12 +132,12 @@ PowercastEnergyHarvester::PowercastEnergyHarvester()
     // NO DEFAULT INITIALIZATION - Must be explicitly configured
     // Use Configure(capClass, voltClass) or SetCapacitorClass() + SetVoltageClass()
     NS_LOG_INFO(
-        "🔋 PowerCast harvester created - MUST be explicitly configured before use (no defaults)");
+        "PowerCast harvester created - MUST be explicitly configured before use (no defaults)");
 
     // Initialize trace variables
     m_vcapTrace = m_vcap;
 
-    // Initialize advanced energy model with nominal/sunk/available separation
+    // Nominal/sunk/available energy split
     m_nominalEnergy = 0.5 * m_cStorage * m_vcap * m_vcap; // Total stored energy
     m_sunkEnergy = 0.5 * m_cStorage * (m_vmin * DEEP_RATIO) *
                    (m_vmin * DEEP_RATIO); // Unusable deep discharge energy
@@ -160,7 +149,7 @@ PowercastEnergyHarvester::PowercastEnergyHarvester()
     m_availableEnergyTrace = m_availableEnergy;
     m_efficiencyTrace = 0.0;
 
-    NS_LOG_INFO("Advanced PowerCast Energy Harvester initialized with:");
+    NS_LOG_INFO("PowerCast energy harvester initialized with:");
     NS_LOG_INFO("  Operating Frequency: " << (OPERATING_FREQUENCY / 1e6) << " MHz");
     NS_LOG_INFO("  Capacitor Class: " << m_capacitorClass << " (" << (m_cStorage * 1e6) << " μF)");
     NS_LOG_INFO("  Voltage Class: " << m_voltageClass << " (Vmax=" << m_vmax << "V, Vmin=" << m_vmin
@@ -171,7 +160,8 @@ PowercastEnergyHarvester::PowercastEnergyHarvester()
     NS_LOG_INFO("  Overshoot Protection: " << (SHOOT_RATIO * 100) << "% of Vmax");
     NS_LOG_INFO("  Initial Available Energy: " << m_availableEnergy << " J");
     NS_LOG_INFO("  Input Power Range: -12 to +15 dBm (datasheet efficiency curve)");
-    NS_LOG_INFO("  🔋 Hysteresis Control: TX disabled until Vcap reaches Vmax (" << m_vmax << "V)");
+    NS_LOG_INFO("  TX gate: no hysteresis, TX allowed while Vcap stays >= DEEP_RATIO*Vmin ("
+                << m_vmin * DEEP_RATIO << "V)");
 }
 
 // NS-3 lifecycle cleanup
@@ -193,11 +183,11 @@ PowercastEnergyHarvester::UpdateActiveTime()
     {
         m_totalActiveTime_us += static_cast<uint64_t>((now - m_lastUpdateTime).GetMicroSeconds());
     }
-    m_lastActiveState = (m_vcap > m_vmin); // strict > per theory.txt
+    m_lastActiveState = (m_vcap > m_vmin); // strict >: exactly Vmin counts as inactive
     m_lastUpdateTime = now;
 }
 
-// Advanced RF energy harvesting with realistic 2.4GHz efficiency and safety mechanisms
+// RF energy harvesting through the Band-6 efficiency curve
 void
 PowercastEnergyHarvester::SetHarvestedEnergy(double rxPowerDbm, Time duration)
 {
@@ -244,7 +234,7 @@ PowercastEnergyHarvester::SetHarvestedEnergy(double rxPowerDbm, Time duration)
     // Calculate theoretical voltage from energy: V = √(2E/C)
     double theoreticalVcap = std::sqrt(2 * m_nominalEnergy / m_cStorage);
 
-    // Apply overshoot protection to prevent capacitor damage
+    // Cap at SHOOT_RATIO*Vmax (= Vmax): harvest stops at a full capacitor
     m_vcap = std::min(theoreticalVcap, m_vmax * SHOOT_RATIO);
 
     // Recalculate energies based on actual clamped voltage
@@ -256,7 +246,7 @@ PowercastEnergyHarvester::SetHarvestedEnergy(double rxPowerDbm, Time duration)
     m_availableEnergyTrace = m_availableEnergy;
     m_efficiencyTrace = efficiency;
 
-    // Comprehensive debugging information
+    // Debug trace of the harvest step
     NS_LOG_DEBUG("RF energy harvesting operation completed:");
     NS_LOG_DEBUG("  Original RX Power: " << rxPowerDbm << " dBm");
     NS_LOG_DEBUG("  Clamped RX Power: " << clampedPowerDbm << " dBm (" << powerMw << " mW)");
@@ -268,7 +258,7 @@ PowercastEnergyHarvester::SetHarvestedEnergy(double rxPowerDbm, Time duration)
     NS_LOG_DEBUG("  Nominal Energy: " << m_nominalEnergy << " J");
 }
 
-// Advanced energy consumption with safety checks and realistic PA modeling
+// TX energy debit (PA / RF-chain efficiency included)
 void
 PowercastEnergyHarvester::SetConsumedEnergy(double txPowerDbm, Time duration)
 {
@@ -296,11 +286,11 @@ PowercastEnergyHarvester::SetConsumedEnergy(double txPowerDbm, Time duration)
     m_totalConsumedEnergy += energyDC;
 
     // Over-draw guard: the energy audit (CanSustainTransmission) should prevent a TX that can't be paid for, but if one slips through (e.g. an aggregate larger than the audit's representative packet), clamp gracefully at the hard floor instead of aborting the run.
-    // Floor = 0.8*Vmin (DEEP_RATIO).
+    // Floor = DEEP_RATIO*Vmin (= Vmin).
     if (energyDC > m_availableEnergy)
     {
         NS_LOG_WARN("TX over-draw clamped: needed " << energyDC << "J, had " << m_availableEnergy
-                                                    << "J — pinning at 0.8*Vmin floor");
+                                                    << "J — pinning at the DEEP_RATIO*Vmin floor");
         m_availableEnergy = 0.0;
         m_nominalEnergy = m_sunkEnergy;
     }
@@ -324,7 +314,7 @@ PowercastEnergyHarvester::SetConsumedEnergy(double txPowerDbm, Time duration)
     m_vcapTrace = m_vcap;
     m_availableEnergyTrace = m_availableEnergy;
 
-    // Comprehensive debugging and monitoring information
+    // Debug trace of the TX debit
     NS_LOG_DEBUG("Energy consumption operation completed:");
     NS_LOG_DEBUG("  TX Power: " << txPowerDbm << " dBm (" << powerMw << " mW)");
     NS_LOG_DEBUG("  Duration: " << duration.GetSeconds() << " s");
@@ -550,8 +540,8 @@ PowercastEnergyHarvester::SetVoltageClass(VoltageClass voltClass)
     // This makes harvest (AP beacon + PDW) the binding throttle on UL from step 1.
     m_vcap = m_vmin;
     m_vcapTrace = m_vcap;
-    NS_LOG_INFO("🔋 Reset capacitor to Vmin (start depleted): " << m_vcap << "V for voltage class "
-                                                                << voltClass);
+    NS_LOG_INFO("Reset capacitor to Vmin (start depleted): " << m_vcap << "V for voltage class "
+                                                             << voltClass);
 
     // Recalculate energy state with new voltage and thresholds
     m_nominalEnergy = 0.5 * m_cStorage * m_vcap * m_vcap;
@@ -572,7 +562,7 @@ PowercastEnergyHarvester::Configure(CapacitorClass capClass, VoltageClass voltCl
     // Initialize Vcap to Vmin (empty/depleted): REHD must harvest before its first UL TX, so harvest (AP beacon + PDW) is the binding throttle on UL from step 1.
     m_vcap = m_vmin;
     m_vcapTrace = m_vcap;
-    NS_LOG_INFO("🔋 Configured capacitor to Vmin (start depleted): "
+    NS_LOG_INFO("Configured capacitor to Vmin (start depleted): "
                 << m_vcap << "V for cap class " << capClass << ", voltage class " << voltClass);
 
     // Recalculate complete energy state with new configuration
@@ -621,7 +611,7 @@ PowercastEnergyHarvester::CanSustainTransmission(double txPowerDbm, Time duratio
     }
 
     // Simple energy audit (no hysteresis, no Vmin lock): can the capacitor pay for THIS transmission without dropping below the hard floor?
-    // m_availableEnergy is the energy above the 0.8*Vmin floor (DEEP_RATIO=0.8), so "available >= required" is exactly "Vcap stays >= 0.8*Vmin after the TX".
+    // m_availableEnergy is the energy above the DEEP_RATIO*Vmin floor (DEEP_RATIO = 1.0), so "available >= required" is exactly "Vcap stays >= Vmin after the TX".
     // TX is allowed the instant enough energy is harvested — no waiting for a full recharge to Vmax.
     double powerMw = std::pow(10.0, txPowerDbm / 10.0);           // dBm → mW
     double energyTx = (powerMw / 1000.0) * duration.GetSeconds(); // RF energy (J)
@@ -642,14 +632,14 @@ PowercastEnergyHarvester::IsOutputEnabled() const
 {
     // Apply dual safety criteria: energy availability and voltage safety margin.
     // Threshold = DEEP_RATIO*Vmin (the same hard floor used by the TX energy audit and the idle-drain clamp) so output-enable, the TX gate and ComputePhase all agree on where "depleted" is.
-    double safetyThreshold = m_vmin * DEEP_RATIO; // hard floor (0.8*Vmin)
+    double safetyThreshold = m_vmin * DEEP_RATIO; // hard floor (DEEP_RATIO*Vmin)
     bool hasEnergy = (m_availableEnergy > 0.0);
     bool hasSafeVoltage = (m_vcap >= safetyThreshold);
 
     NS_LOG_DEBUG("Output enable status check:");
     NS_LOG_DEBUG("  Available energy: " << m_availableEnergy << " J");
     NS_LOG_DEBUG("  Current Vcap: " << m_vcap << " V");
-    NS_LOG_DEBUG("  Safety threshold (80% Vmin): " << safetyThreshold << " V");
+    NS_LOG_DEBUG("  Safety threshold (DEEP_RATIO*Vmin): " << safetyThreshold << " V");
     NS_LOG_DEBUG("  Output enabled: " << (hasEnergy && hasSafeVoltage));
 
     return hasEnergy && hasSafeVoltage;

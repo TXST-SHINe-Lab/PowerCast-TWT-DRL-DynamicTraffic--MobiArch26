@@ -18,9 +18,9 @@ Each worker:
   3. Runs the full episode using the provided policy state_dict for inference.
   4. Collects a rollout buffer and pushes it to the result queue.
   5. Calls os._exit(0) at the end to skip the Boost.Interprocess static
-     destructor (lesson #2 in wifi-simulation/parallelization-lessons.md).
+     destructor, which hangs on the still-mapped shared memory.
 
-The orchestrator MUST drain the result queue BEFORE p.join() (lesson #3).
+The orchestrator MUST drain the result queue BEFORE p.join(): a child blocked on a full queue pipe never exits.
 """
 
 import os
@@ -72,7 +72,7 @@ NUM_STA_FEATURES = 7  # time-local feed (2026-06-07 rework); see spec below
 #    [4] snr        clip((snr_db-48)/(65.35-48), 0, 1)        (weak, geometry)
 #    [5] silence    recency: clip((now-last_rx)/STEP_US, 0, 1), 1.0 = never seen
 #    [6] starv_rate clip(Δsp_with_starvation / Δsp_with_demand, 0, 1)  (REHD/airtime-bound tell)
-# REPLACED the old leaky 18-feat set: dropped ALL cumulative-level features (airtime/awake/sleep/duty/pkts_tx as lifetime AVERAGES violated the time-local rule, memory feedback-time-local-signals), the dead per-AC BSR (uniform AC_BE), and the REDUNDANT dbytes_rx (|r|=0.965 with dairtime, EDA round-1).
+# REPLACED the old leaky 18-feat set: dropped ALL cumulative-level features (airtime/awake/sleep/duty/pkts_tx as lifetime AVERAGES violated the time-local rule), the dead per-AC BSR (uniform AC_BE), and the REDUNDANT dbytes_rx (|r|=0.965 with dairtime, EDA round-1).
 # Norms re-fit from the controllability EDA (norms_fitted.json). When this changes, move every rule-#29 dependent default together.
 DEFAULT_NUM_STA = 16  # fallback when env_dict has no num_sta and caller passes None
 
@@ -160,8 +160,8 @@ def default_obs_kwargs(policy_arch, n_total):
     F = NUM_STA_FEATURES
     flat = int(n_total) * F
     # Auto-derive the action-head sizes from the shipped action tables so the policy heads
-    # always match the (carved) table — no manual --policy-kwargs to forget (rule #29 logic,
-    # extended to the action heads). user_kwargs still override via the {**default, **user} merge.
+    # always match the (carved) table — no manual --policy-kwargs to forget
+    # (same idea as deriving obs_dim from the topology). user_kwargs still override via the {**default, **user} merge.
     ns, na, npd = action_head_sizes()
     if policy_arch in ("mlp_ppo", "lstm_ppo"):
         # features_per_sta sizes the per-feature obs-norm buffers (BasePolicy obs_rms).
@@ -209,12 +209,12 @@ def _resolve_num_sta(num_sta, *envs):
 def _build_per_sta_features(prev_env, curr_env, num_sta):
     """Per-STA FINAL time-local feed: (num_sta, 7). REALISTIC, AP-observable obs only.
     Every feature is a per-step DELTA, instantaneous LEVEL, RECENCY, or RATIO — NO
-    cumulative counter reaches the agent (HARD RULE, memory feedback-time-local-signals;
+    cumulative counter reaches the agent (hard rule;
     the old 18-feat set leaked lifetime averages and is removed). Each is variance-
     stabilized (log1p for bursty counts) + bounded ~[0,1]; the PER-FEATURE running
     z-score is applied DOWNSTREAM inside the policy (BasePolicy obs_rms, warm-started
     from obs_warmstart_stats.json) — NOT here. Oracle (energy/queue/served/expiry) stays
-    REWARD-ONLY; the agent must INFER energy/REHD state from these signals (rule #25).
+    REWARD-ONLY; the agent must INFER energy/REHD state from these signals (the AP is class-blind).
 
       Feature spec (order MUST match obs_warmstart_stats.json):
         [0] bsr_be     = log1p(bsr_queue_ac_be) / log1p(254)          level, heavy-tailed

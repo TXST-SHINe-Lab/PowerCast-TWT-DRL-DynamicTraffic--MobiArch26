@@ -5,6 +5,11 @@
 // Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
 // PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
 
+/**
+ * @file pb-twt-wrapper-ns3.cc
+ * @brief TWTWrapper implementation: EnvStruct/ActionStruct exchange with Python over ns3-ai shared memory
+ */
+
 #include "pb-twt-wrapper-ns3.h"
 
 #include "pb-twt-core.h"

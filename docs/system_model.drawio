@@ -1,0 +1,139 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="system_model" id="sysmodel-1">
+    <mxGraphModel dx="1071" dy="603" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="880" pageHeight="640" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;align=center;verticalAlign=middle;fontSize=16;fontStyle=1" value="TWT + RF Energy-Harvesting System Model: 12 STAs + 8 REHDs + 1 AP" vertex="1">
+          <mxGeometry height="30" width="560" x="40" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="room" parent="1" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=#f5f7fa;strokeColor=#5d6d7e;verticalAlign=bottom;fontSize=16;fontColor=#34495e;fontStyle=1" value="&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;14 m × 14 m Indoor Environment" vertex="1">
+          <mxGeometry height="520" width="520" x="40" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="circOuter" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D4E1F5;strokeColor=#b85450;fontSize=16;fontStyle=1;fillStyle=solid;" value="" vertex="1">
+          <mxGeometry height="446" width="446" x="77" y="107" as="geometry" />
+        </mxCell>
+        <mxCell id="circInner" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=light-dark(#FFFFFF,#FFFFFF);strokeColor=#b85450;fontSize=16;fontStyle=1" value="" vertex="1">
+          <mxGeometry height="112" width="112" x="244" y="274" as="geometry" />
+        </mxCell>
+        <mxCell id="lblOuter" parent="1" style="text;html=1;align=center;fontSize=16;fontColor=#b85450;fontStyle=1" value="4.75 m" vertex="1">
+          <mxGeometry height="16" width="36" x="282" y="106" as="geometry" />
+        </mxCell>
+        <mxCell id="lblInner" parent="1" style="text;html=1;align=center;fontSize=16;fontColor=#b85450;fontStyle=1" value="1.5 m" vertex="1">
+          <mxGeometry height="14" width="40" x="280" y="276" as="geometry" />
+        </mxCell>
+        <mxCell id="lblAnnulus" parent="1" style="text;html=1;align=left;fontSize=16;fontStyle=3;fontColor=#b85450;" value="REHD harvesting annulus" vertex="1">
+          <mxGeometry height="16" width="170" x="215" y="424" as="geometry" />
+        </mxCell>
+        <mxCell id="ap" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=16;fontStyle=1;" value="AP" vertex="1">
+          <mxGeometry height="48" width="48" x="276" y="306" as="geometry" />
+        </mxCell>
+        <mxCell id="rehd6" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=16;fontStyle=1;" value="REHD" vertex="1">
+          <mxGeometry height="55" width="55" x="221" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="sta1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;fontStyle=1" value="IoT" vertex="1">
+          <mxGeometry height="30" width="30" x="60" y="95" as="geometry" />
+        </mxCell>
+        <mxCell id="sta2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=16;fontStyle=1" value="Cam" vertex="1">
+          <mxGeometry height="30" width="37" x="156" y="89" as="geometry" />
+        </mxCell>
+        <mxCell id="sta3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=16;fontStyle=1" value="Voi" vertex="1">
+          <mxGeometry height="30" width="30" x="505" y="95" as="geometry" />
+        </mxCell>
+        <mxCell id="sta4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=16;fontStyle=1" value="Vid" vertex="1">
+          <mxGeometry height="30" width="30" x="459" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="sta5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;fontStyle=1" value="IoT" vertex="1">
+          <mxGeometry height="30" width="30" x="505" y="545" as="geometry" />
+        </mxCell>
+        <mxCell id="sta7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=16;fontStyle=1" value="Voi" vertex="1">
+          <mxGeometry height="30" width="30" x="60" y="545" as="geometry" />
+        </mxCell>
+        <mxCell id="sta8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=16;fontStyle=1" value="Vid" vertex="1">
+          <mxGeometry height="30" width="30" x="50" y="295" as="geometry" />
+        </mxCell>
+        <mxCell id="sta9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;fontStyle=1" value="IoT" vertex="1">
+          <mxGeometry height="30" width="30" x="124" y="208" as="geometry" />
+        </mxCell>
+        <mxCell id="sta11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=16;fontStyle=1" value="Voi" vertex="1">
+          <mxGeometry height="30" width="30" x="358.5" y="489" as="geometry" />
+        </mxCell>
+        <mxCell id="sta12" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;fontStyle=1" value="IoT" vertex="1">
+          <mxGeometry height="30" width="30" x="66" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="legBox" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#aab7b8;fontSize=16;fontStyle=1" value="" vertex="1">
+          <mxGeometry height="306" width="258" x="560" y="70" as="geometry" />
+        </mxCell>
+        <mxCell id="legTitle" parent="1" style="text;html=1;align=left;fontSize=16;fontStyle=1;" value="Device classes" vertex="1">
+          <mxGeometry height="20" width="200" x="620" y="86" as="geometry" />
+        </mxCell>
+        <mxCell id="legAt" parent="1" style="text;html=1;align=left;fontSize=16;fontStyle=1" value="IoT sensor (~40 kbps)" vertex="1">
+          <mxGeometry height="30" width="200" x="610" y="128" as="geometry" />
+        </mxCell>
+        <mxCell id="legDt" parent="1" style="text;html=1;align=left;fontSize=16;fontStyle=1" value="Video stream (~12 Mbps)" vertex="1">
+          <mxGeometry height="20" width="200" x="610" y="285.5" as="geometry" />
+        </mxCell>
+        <mxCell id="legEt" parent="1" style="text;html=1;align=left;fontSize=16;fontStyle=1;" value="REHD (Intermittent)" vertex="1">
+          <mxGeometry height="20" width="210" x="637" y="334" as="geometry" />
+        </mxCell>
+        <mxCell id="cfgBox" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#aab7b8;fontSize=16;fontStyle=1" value="" vertex="1">
+          <mxGeometry height="200" width="250" x="570" y="390" as="geometry" />
+        </mxCell>
+        <mxCell id="cfgTitle" parent="1" style="text;html=1;align=left;fontSize=16;fontStyle=1;" value="Deployment / PHY" vertex="1">
+          <mxGeometry height="20" width="220" x="612" y="395" as="geometry" />
+        </mxCell>
+        <mxCell id="cfgBody" parent="1" style="text;html=1;align=left;verticalAlign=top;fontSize=16;whiteSpace=wrap;fontStyle=1" value="&lt;ul&gt;&lt;li&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;2.4 GHz ISM, 20 MHz BW&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;AP: 30 dBm + 6 dBi EIRP&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;REHD: 10 dBm + 6 dBi rectenna&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;Beacon interval: 102.4 ms&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;TWT update: every 25 BI&lt;/font&gt;&lt;/li&gt;&lt;li&gt;&lt;font style=&quot;font-size: 15px;&quot;&gt;REHD annulus: 1.5--4.75 m&lt;/font&gt;&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="156" width="273" x="546.5" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-1" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=16;fontStyle=1;" value="REHD" vertex="1">
+          <mxGeometry height="55" width="55" x="372" y="375" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-2" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=16;fontStyle=1;" value="REHD" vertex="1">
+          <mxGeometry height="55" width="55" x="143.5" y="343" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-3" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=16;fontStyle=1;" value="REHD" vertex="1">
+          <mxGeometry height="55" width="55" x="207" y="238" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-4" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=16;fontStyle=1;" value="REHD" vertex="1">
+          <mxGeometry height="55" width="55" x="341" y="128" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-5" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=16;fontStyle=1;" value="REHD" vertex="1">
+          <mxGeometry height="55" width="55" x="442" y="268" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-6" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=16;fontStyle=1;" value="REHD" vertex="1">
+          <mxGeometry height="55" width="55" x="172" y="147.5" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-7" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=16;fontStyle=1;" value="REHD" vertex="1">
+          <mxGeometry height="55" width="55" x="346" y="227" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=16;fontStyle=1" value="Cam" vertex="1">
+          <mxGeometry height="30" width="37" x="417" y="191" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=16;fontStyle=1" value="Cam" vertex="1">
+          <mxGeometry height="30" width="37" x="427" y="529" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=16;fontStyle=1" value="IoT" vertex="1">
+          <mxGeometry height="30" width="30" x="573" y="128" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-14" parent="1" style="text;html=1;align=left;fontSize=16;fontStyle=1" value="Video camera (~4 Mbps)" vertex="1">
+          <mxGeometry height="30" width="200" x="610" y="188" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-16" parent="1" style="text;html=1;align=left;fontSize=16;fontStyle=1" value="Voice assistant (~64 kbps)" vertex="1">
+          <mxGeometry height="30" width="200" x="610" y="238" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-18" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=16;fontStyle=1" value="Voi" vertex="1">
+          <mxGeometry height="30" width="30" x="573" y="238" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-20" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=16;fontStyle=1" value="Cam" vertex="1">
+          <mxGeometry height="30" width="37" x="569.5" y="188" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-21" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=16;fontStyle=1" value="Vid" vertex="1">
+          <mxGeometry height="30" width="30" x="573" y="285.5" as="geometry" />
+        </mxCell>
+        <mxCell id="6G6UrTRtUAj_JxR4LNfM-22" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=16;fontStyle=1;" value="REHD" vertex="1">
+          <mxGeometry height="55" width="55" x="567.5" y="320" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

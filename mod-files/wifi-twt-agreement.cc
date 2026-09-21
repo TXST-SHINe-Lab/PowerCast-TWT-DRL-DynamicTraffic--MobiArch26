@@ -16,6 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Authors: Shyam K Venkateswaran <vshyamkrishnan@gmail.com>
+ *
+ * Modified by: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
+ *              Texas State University
+ *              Applied NS-3.44 compatibility fixes (IsRunning -> IsPending)
  */
 
 #include "wifi-twt-agreement.h"

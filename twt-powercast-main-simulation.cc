@@ -5,6 +5,11 @@
 // Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
 // PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
 
+/**
+ * @file twt-powercast-main-simulation.cc
+ * @brief NS-3 main() for the TWT + PowerCast RL environment
+ */
+
 #include "pb-twt-wrapper-ns3.h"
 #include "twt-metrics.h"
 #include "twt-simulation-config.h"

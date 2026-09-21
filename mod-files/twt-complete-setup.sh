@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# Author: Ahmed Maksud; email: ahmed.maksud@email.ucr.edu
+# PI: Marcelo Menezes De Carvalho; email: mmcarvalho@txstate.edu
+# Texas State University
+#
 
 ################################################################################
 # Complete NS-3.44 TWT Setup Script
@@ -710,12 +715,14 @@ if [ -f "$CMAKE_FILE" ]; then
         print_info "Adding TWT files to CMakeLists.txt..."
 
         # Add source file
-        sed -i '/model\/wifi-.*\.cc/a\
-    model/wifi-twt-agreement.cc' "$CMAKE_FILE"
+        sed -i '0,/model\/wifi-.*\.cc/{/model\/wifi-.*\.cc/a\
+    model/wifi-twt-agreement.cc
+}' "$CMAKE_FILE"
 
         # Add header file
-        sed -i '/model\/wifi-.*\.h/a\
-    model/wifi-twt-agreement.h' "$CMAKE_FILE"
+        sed -i '0,/model\/wifi-.*\.h/{/model\/wifi-.*\.h/a\
+    model/wifi-twt-agreement.h
+}' "$CMAKE_FILE"
 
         print_success "Added TWT files to CMakeLists.txt"
     fi
@@ -809,13 +816,13 @@ if [ $ISSUES -eq 0 ]; then
     print_success "ALL CHECKS PASSED! TWT setup completed successfully."
     echo ""
     cat <<EOF
-✅ Complete TWT Setup Applied:
+✓ Complete TWT Setup Applied:
 
-📁 Downloaded/Copied Files:
+Downloaded/Copied Files:
   ✓ $TWT_AGREEMENT_H (from GitHub if needed)
   ✓ $TWT_AGREEMENT_CC (from GitHub if needed)
 
-🔧 Modified Files:
+Modified Files:
   ✓ $WIFI_MAC_H (TWT method declarations)
   ✓ $WIFI_MAC_CC (TWT method implementations)
   ✓ $WIFI_RSM_H (TWT support structures)
@@ -824,15 +831,15 @@ if [ $ISSUES -eq 0 ]; then
   ✓ $AP_WIFI_MAC_H (AP GetTimeTillNextBeacon declaration)
   ✓ $AP_WIFI_MAC_CC (AP GetTimeTillNextBeacon implementation)
 
-🛠️  Compatibility Fixes:
+Compatibility Fixes:
   ✓ EventId::IsRunning() → IsPending()
   ✓ Removed GetNavDurationLeft() calls
   ✓ NS-3.44 compatible TWT API
 
-📋 Build System:
+Build System:
   ✓ CMakeLists.txt updated (if found)
 
-🚀 NEXT STEPS:
+NEXT STEPS:
   1. Rebuild NS-3:
      cd $NS3_ROOT
      ./ns3 clean
@@ -840,9 +847,9 @@ if [ $ISSUES -eq 0 ]; then
      ./ns3 build
 
   2. Test TWT functionality:
-     ./ns3 run "contrib/ai/examples/MobiCom/twt/powercast-twt-demo.cc"
+     ./ns3 run "twt-powercast-main-simulation"
 
-🎯 TWT Features Available:
+TWT Features Available:
   - Complete WiFi 6 TWT support
   - ANNOUNCED/UNANNOUNCED modes
   - Individual/Broadcast agreements

@@ -94,9 +94,12 @@ def main():
     args = parse_args()
     script_dir = os.path.dirname(os.path.abspath(__file__))
     parent_dir = os.path.dirname(script_dir)
+    ppo_dir = os.path.join(
+        parent_dir, "ppo-sb3-scripts"
+    )  # twt_models / twt_spawn_worker live there
     ns3_root = os.path.abspath(os.path.join(parent_dir, "..", "..", "..", ".."))
 
-    sys.path.insert(0, script_dir)
+    sys.path.insert(0, ppo_dir)
     sys.path.insert(0, parent_dir)
 
     from twt_models import get_policy, list_policies
@@ -161,7 +164,7 @@ def main():
             p.start()
             workers.append(p)
 
-        # CRITICAL: drain queue BEFORE join (lesson #3)
+        # Drain the queue BEFORE join: a child blocked on a full queue pipe never exits
         results = []
         for _ in range(args.num_workers):
             try:
@@ -250,5 +253,7 @@ def main():
 
 
 if __name__ == "__main__":
-    mp.set_start_method("spawn")  # lesson #4
+    mp.set_start_method(
+        "spawn"
+    )  # spawn, not fork: each worker starts a clean interpreter and imports the ns3-ai binding itself
     sys.exit(main())

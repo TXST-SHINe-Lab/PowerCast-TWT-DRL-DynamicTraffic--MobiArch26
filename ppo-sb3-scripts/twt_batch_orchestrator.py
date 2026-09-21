@@ -16,7 +16,7 @@ Architecture (option A from design discussion):
   - Per batch:
         1. Pickle {name, kwargs, state_dict} as the policy payload.
         2. Spawn NUM_WORKERS mp.Process workers (twt_spawn_worker.run_episode).
-        3. Drain the result queue BEFORE joining (lesson #3).
+        3. Drain the result queue BEFORE joining (a child blocked on a full queue pipe never exits, so join() would hang).
         4. Join workers.
         5. Compute returns + GAE advantages from collected rollouts.
         6. Run K epochs of clipped-surrogate PPO over minibatches.
@@ -957,5 +957,7 @@ def main():
 
 
 if __name__ == "__main__":
-    mp.set_start_method("spawn")  # wifi-simulation lesson #4
+    mp.set_start_method(
+        "spawn"
+    )  # spawn, not fork: each worker starts a clean interpreter and imports the ns3-ai binding itself
     main()

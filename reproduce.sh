@@ -17,7 +17,7 @@
 #                   RUN_PLOT   harvest/Vcap diagnostic plots (120 s grouped-sleep sim)
 #                   RUN_EDA    EDA sweep + fit of obs_warmstart_stats.json
 #                   RUN_TRAIN  lstm_ppo + asymmetric critic, 200 batches x 24 episodes
-#                   RUN_EVAL   trained policy vs fixed / random / analytical baselines
+#                   RUN_EVAL   trained policy vs the analytical_md1 baseline, per device class
 #                RUN_TABLES is off here: stage 1 above already carved the tables.
 #   3  vcap      paper Vcap-vs-time figure traces (vcap_episode.py, seeds 42-45)
 #   4  figs      make_figs.py -> all data-driven paper figures (+ console T1/T2 numbers)
@@ -25,65 +25,85 @@
 # Stage 2 IS run_pipeline.sh — read that script for the EDA/train/eval mechanics; this
 # wrapper only pins the paper's parameters and tells it where to put its outputs.
 #
-# THE DEFAULT IS A FULL WIPE + FULL REBUILD OF EVERYTHING GENERATED. Bare
-# `bash reproduce.sh` runs all five stages and, before them, deletes every generated
-# artifact: all of results/ (checkpoints, eval shards, EDA shards, traces, figures)
-# plus the three generated files that live in the source tree (the two action tables
-# and the fitted obs norms). Stage 0 runs `ns3 clean` and rebuilds ns-3 from scratch.
-# Nothing is carried over. The clean build dominates the setup cost (tens of minutes);
-# NS3_CLEAN=0 makes stage 0 incremental when you are iterating.
+# Every invocation writes into its own run folder, results/runs/run_YYYYMMDD_HHMMSS/ (the same run_<timestamp> naming as the ICCCN'26 repo's run_all.sh).
+# Earlier runs, the committed run (results/runs/repro_20260825/) and the committed figures (results/figs/) are never deleted or overwritten.
+# The run folder holds pipeline/ (EDA, checkpoints, eval), figs/ (this run's figures + vcap_data.csv), pipeline.log, and inputs_before/.
 #
-# Narrowing STAGES deliberately DISABLES the wipe (see "clean slate" below) so a
-# figures-only or vcap-only rerun cannot delete the run it is about to read.
+# Three generated inputs live in the source tree and are shared by every run: the two action tables (stage 1) and ppo-sb3-scripts/obs_warmstart_stats.json (stage 2 applies the refit norms before training).
+# They are regenerated in place, so the previous copies are saved to <run>/inputs_before/ first.
+#
+# Stage 0 runs `ns3 clean` and rebuilds ns-3 from scratch; that dominates the setup cost (tens of minutes).
+# NS3_CLEAN=0 makes it incremental when you are iterating.
+#
+# RUN selects the run folder: a bare name (RUN=run_20260918_185730) is looked up under results/runs/, a path is used as given.
+# It is required when STAGES has 4 but not 2 (figures need a finished pipeline to read).
 #
 # Usage:
-#   bash reproduce.sh                  # everything, paper-exact params (multi-hour)
-#   STAGES="2" bash reproduce.sh        # just re-run EDA+train+eval via run_pipeline.sh
-#   STAGES="4" bash reproduce.sh        # just regenerate figures from the latest run
-#   CLEAN=0 bash reproduce.sh           # full run but KEEP previous artifacts
-#   NS3_CLEAN=0 bash reproduce.sh       # skip `ns3 clean` (incremental build, much faster)
-#   CLEAN=force STAGES="4" bash reproduce.sh   # wipe even on a narrowed run
-#   RUN_EDA=0 bash reproduce.sh         # (passes through to run_pipeline.sh) skip EDA/norms
-#   EDA_BATCHES=100 bash reproduce.sh    # EDA episodes = EDA_BATCHES x EDA_WORKERS (default 100x20)
+#   bash reproduce.sh                                   # everything, paper-exact params (multi-hour), new run folder
+#   RUN=run_20260918_185730 STAGES="2 3 4" bash reproduce.sh   # resume an interrupted run (finished EDA shards are skipped)
+#   RUN=repro_20260825 STAGES="4" bash reproduce.sh     # regenerate figures from the committed run into its figs/
+#   NS3_CLEAN=0 bash reproduce.sh                       # skip `ns3 clean` (incremental build, much faster)
+#   RUN_EDA=0 bash reproduce.sh                         # (passes through to run_pipeline.sh) skip EDA/norms
+#   EDA_BATCHES=100 bash reproduce.sh                   # EDA episodes = EDA_BATCHES x EDA_WORKERS (default 100x20)
 #   TRAIN_BATCHES=200 NUM_WORKERS=16 bash reproduce.sh
+#   CLEAN=1 bash reproduce.sh                           # opt-in: delete everything under results/ first (the old default)
 set -u
 
-NS3=/workspace/ns-allinone-3.44/ns-3.44
-VENV=/workspace/EHRL
-PY=$VENV/bin/python3.11
-# Resolve THIS example's directory from the script location.
+# Resolve THIS example's directory from the script location, and the ns-3 root + venv from it (same convention as run_pipeline.sh: <NS3_ROOT>/../../EHRL, override with VENV=...).
 # Was hardcoded to a stale directory name ("mobicom"), which silently pointed every stage at a path that no longer exists once the directory was renamed.
 EX="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 EXNAME="$(basename "$EX")"
+NS3="$(cd "$EX/../../../.." && pwd)"
+VENV="${VENV:-$(cd "$NS3/../.." && pwd)/EHRL}"
+PY=$VENV/bin/python3.11
 SCR=$EX/ppo-sb3-scripts
 EXP=$EX/exploration-scripts
 
-RESULTS=$EX/results                             # SINGLE generated-output root
-RUN=${RUN:-$RESULTS/runs/repro_$(date +%Y%m%d)} # all run artifacts live here
-PIPE_ROOT=$RUN/pipeline                         # handed to run_pipeline.sh as RUN_ROOT
-FIGS_DIR=${PAPER_FIGS_DIR:-$RESULTS/figs}
-VCAP_DATA=$FIGS_DIR/vcap_data.csv
-
+RESULTS=$EX/results # SINGLE generated-output root
 STAGES=${STAGES:-"0 1 2 3 4"}
+has() { echo " $STAGES " | grep -q " $1 "; }
+
+# --- run folder ---
+# Unset: a fresh results/runs/run_<timestamp>/ for this invocation.
+# A bare name is looked up under results/runs/; a relative path is resolved against the caller's cwd (the script cd's to the ns-3 root below).
+if [ -z "${RUN:-}" ]; then
+    if has 4 && ! has 2; then
+        echo "ERROR: STAGES='$STAGES' reads a finished pipeline; name the run with RUN=<name>. Available runs:"
+        ls -1 "$RESULTS/runs" 2>/dev/null | sed 's/^/  /'
+        exit 1
+    fi
+    RUN="$RESULTS/runs/run_$(date +%Y%m%d_%H%M%S)"
+else
+    case "$RUN" in
+        */*) case "$RUN" in /*) ;; *) RUN="$PWD/$RUN" ;; esac ;;
+        *) RUN="$RESULTS/runs/$RUN" ;;
+    esac
+    if ! has 2 && [ ! -d "$RUN" ]; then
+        echo "ERROR: RUN='$RUN' does not exist. Available runs:"
+        ls -1 "$RESULTS/runs" 2>/dev/null | sed 's/^/  /'
+        exit 1
+    fi
+fi
+PIPE_ROOT=$RUN/pipeline # handed to run_pipeline.sh as RUN_ROOT
+FIGS_DIR=${PAPER_FIGS_DIR:-$RUN/figs}
+VCAP_DATA=$FIGS_DIR/vcap_data.csv
 
 cd "$NS3"
 source "$VENV/bin/activate" 2>/dev/null || true
-has() { echo " $STAGES " | grep -q " $1 "; }
 banner() {
     echo
     echo "==================== STAGE $1: $2 ===================="
     date
 }
 
-# ----------------------------- clean slate -----------------------------------
-# A fresh run starts empty: every generated artifact is removed first, so nothing from a previous run can be silently reused, half-overwritten, or mistaken for new output.
-# This covers results/ AND the two generated files that live in the source tree (the action tables and the fitted obs norms) -- those are regenerated by stages 1 and 2, and a stale table silently mis-sizes the policy's action heads.
-#
-# GUARDED: only fires when the pipeline stage (2) is selected. A figures-only rerun
-# (STAGES=4) or a vcap-only rerun (STAGES=3) must not delete the run it is reading.
-#   CLEAN=0      never clean
+# ----------------------------- clean slate (opt-in) ---------------------------
+# Off by default: each run already gets its own folder, so nothing from a previous run can be reused or overwritten.
+# CLEAN=1 restores the old behaviour for a full run: delete everything under results/ (committed run and figures included) plus the generated action tables and obs norms.
+# It only fires when the pipeline stage (2) is selected, so a figures-only or vcap-only rerun cannot delete the run it is reading.
+#   CLEAN=0      never clean (default)
+#   CLEAN=1      clean when stage 2 is selected
 #   CLEAN=force  clean regardless of which stages are selected
-CLEAN=${CLEAN:-1}
+CLEAN=${CLEAN:-0}
 clean_slate() {
     banner C "clean slate — removing previous results"
     # Refuse to rm -rf anything that is not exactly <this example>/results.
@@ -115,13 +135,20 @@ clean_slate() {
         echo "  cleared obs norms (stage 2 regenerates)"
     fi
 }
-if [ "$CLEAN" = "force" ] || { [ "$CLEAN" != "0" ] && has 2; }; then
+if [ "$CLEAN" = "force" ] || { [ "$CLEAN" = "1" ] && has 2; }; then
     clean_slate
-else
-    echo "[clean] SKIPPED (CLEAN=$CLEAN, STAGES='$STAGES') — previous results left in place"
 fi
 
 mkdir -p "$RUN"
+echo "[run] $RUN"
+
+# Save the shared source-tree inputs this run is about to regenerate, so the previous versions are kept with the run.
+if has 1 || has 2; then
+    mkdir -p "$RUN/inputs_before"
+    for f in "$EXP/schedule_table.json" "$EXP/assignment_table.json" "$SCR/obs_warmstart_stats.json"; do
+        [ -f "$f" ] && cp -p "$f" "$RUN/inputs_before/"
+    done
+fi
 
 # Reap orphan ns-3 children + clear stale SHM (the shell blocks pkill, so os.kill).
 reap() {
@@ -217,7 +244,7 @@ if has 2; then
     rc=${PIPESTATUS[0]}
     reap
     echo "[pipeline] run_pipeline.sh rc=$rc — see $RUN/pipeline.log"
-    [ "$rc" -ne 0 ] && echo "[pipeline] FAILED — rerun 'STAGES=2 bash reproduce.sh' after inspecting the log"
+    [ "$rc" -ne 0 ] && echo "[pipeline] FAILED — inspect the log, then resume with: RUN=$(basename "$RUN") STAGES=\"2 3 4\" bash reproduce.sh"
 fi
 
 # ----------------------------- 3. vcap sims + extract ------------------------
@@ -324,6 +351,11 @@ if has 4; then
     # Point make_figs at THIS reproduction run (env overrides; falls back to shipped run).
     [ -d "$EVAL_SHARDS" ] && export PAPER_EVAL_DIR="$EVAL_SHARDS"
     [ -n "$CKPT" ] && export PAPER_TRAIN_GLOB="$(dirname "$CKPT")/training_log.jsonl"
+    # A run that skipped stage 3 (e.g. the committed repro_20260825) has no vcap_data.csv of its own; fall back to the committed one.
+    if [ ! -f "$VCAP_DATA" ] && [ -f "$RESULTS/figs/vcap_data.csv" ]; then
+        echo "[figs] no $VCAP_DATA — using the committed results/figs/vcap_data.csv"
+        VCAP_DATA="$RESULTS/figs/vcap_data.csv"
+    fi
     export PAPER_VCAP_DATA="$VCAP_DATA"
     export PAPER_FIGS_DIR="$FIGS_DIR"
     mkdir -p "$FIGS_DIR"

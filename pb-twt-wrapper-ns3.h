@@ -5,6 +5,11 @@
 // Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
 // PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
 
+/**
+ * @file pb-twt-wrapper-ns3.h
+ * @brief NS-3 Object TWTWrapper declaration for the C++/Python scheduling bridge
+ */
+
 #ifndef PB_TWT_WRAPPER_H
 #define PB_TWT_WRAPPER_H
 

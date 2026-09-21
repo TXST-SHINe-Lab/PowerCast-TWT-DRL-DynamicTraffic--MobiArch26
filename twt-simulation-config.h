@@ -5,6 +5,11 @@
 // Author: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
 // PI: Marcelo Menezes De Carvalho <mmcarvalho@txstate.edu>
 
+/**
+ * @file twt-simulation-config.h
+ * @brief Network topology, device and REHD classes, and TWT/PDW schedule application
+ */
+
 #ifndef TWT_SIMULATION_CONFIG_H
 #define TWT_SIMULATION_CONFIG_H
 
@@ -77,11 +82,12 @@ struct RehdTypeTemplate
     double interval_min_s;
     double interval_max_s;
     // Constant fields for the type
-    double latency_bound_s;
+    double
+        latency_bound_s; // not used: every REHD gets the 200 ms deadline set in InitializeHeterogeneousNetwork()
     double priority_level;
 };
 
-// Traffic ramped 2026-05-28 (user-directed) so each REHD generates ~1 data packet every few beacon intervals (BI = 102.4 ms) — enough to build a backlog that the energy-gated TX must drain.
+// Traffic ramped 2026-05-28 so each REHD generates ~1 data packet every few beacon intervals (BI = 102.4 ms) — enough to build a backlog that the energy-gated TX must drain.
 // The OnOff app fires a fixed 50 ms burst every `interval` s; the peak rate is sized so that 50 ms ≈ one packet, and the interval is set to a few BI.
 // So `interval` is the burst period and `peak` sets packets-per-burst.
 // Resulting data-packet spacing ≈ interval ≈ 2-6 BI.
@@ -96,7 +102,7 @@ static const RehdTypeTemplate REHD_T1_TEMPLATE = {
     72, // 60 ± 12 B
     0.4,
     0.6,  // burst every 0.4-0.6 s (~4-6 BI)
-    30.0, // 30 s latency bound (very tolerant)
+    30.0, // latency_bound_s (unused)
     0.2   // lowest priority (AC_BK)
 };
 
@@ -184,7 +190,7 @@ struct StaApplicationConfig
 
 // --- PREDEFINED DEVICE CONFIGURATIONS ---
 
-// HETEROGENEITY WIDENING (2026-06-07, user-directed): make the network LOPSIDED so scheduling/assignment is decisive.
+// HETEROGENEITY WIDENING (2026-06-07): make the network LOPSIDED so scheduling/assignment is decisive.
 // Spread widened to ~40 kbps (IoT mouse) .. 12 Mbps (Video elephant) ~= 300x, and the class-draw skewed toward mice (few elephants, many mice) — see the weighted draw in InitializeHeterogeneousNetwork.
 // trafficScale is re-calibrated after this change (the old 1.9 anchor was for the balanced 64k-5M mix).
 static const StaApplicationConfig IOT_SENSOR_CONFIG = {

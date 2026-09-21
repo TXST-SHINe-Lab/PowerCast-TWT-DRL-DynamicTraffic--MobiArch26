@@ -9,11 +9,7 @@
 """
 exploration-scripts/generate_action_tables.py
 =============================================
-SYSTEMATIC COARSE-UNIFORM action grid (2026-06-21 rewrite).
-
-Replaces the prior stratified-RANDOM (Dirichlet) 40x40 table, which was being
-*truncated* to 25x25 at train time (dropping every >5-group schedule even though
-the paper claims up to K groups). The new philosophy (agreed with the user):
+CARVED action grid (2026-06-21), built in three steps:
 
   1. Lay down a SYSTEMATIC, UNIFORM grid over the whole action space — a
      deterministic lattice, no random sampling, nothing left unexplored.
@@ -23,31 +19,21 @@ the paper claims up to K groups). The new philosophy (agreed with the user):
      spots (finer segments near consistently-good actions). The action space is
      RE-ALLOCATED, never grown.
 
-This file emits the LAYER-1 coarse uniform grid: 30 schedules x 25 assignments.
-With the PDW head (10 levels) that is 30 x 25 x 10 = 7,500 combos — squarely in
-the proven-learnable range, so the same table doubles as the first training space.
+Step 1 was a 30 x 25 lattice (K = 1..10 x 3 budgets; all_to_one, round_robin, split_n,
+weighted front/back, interleave). This file emits the step-3 carve: 24 schedules x 25
+assignments, 24 x 25 x 10 = 6,000 joint actions with the PDW head.
 
-SCHEDULES (30) — deterministic lattice over (K, total-budget); equal durations.
-  K (num groups)  in 1..MAX_K (=10; 20 STAs need finer grouping. MAX_NUM_TWT_GROUPS=16
-                  is the C++ ceiling in twt-constants.h, so K=10 fits without a rebuild.)
-  budget fraction in BUDGET_FRACS of the per-K feasible max B_max(K)=MAX_SPAN-(K-1)*gap
-  durations       = EQUAL within a schedule (B/K each). Duration-SKEW (unequal groups)
-                    is deferred to the refinement pass; it is partly covered already by
-                    the weighted assignment patterns (more STAs in a group => effective
-                    imbalance), so the coarse map does not need it.
-  => 10 K x 3 budgets = 30 schedules.
+SCHEDULES (24) — K in SCHED_KS x BUDGET_FRACS of the per-K feasible maximum
+  B_max(K) = MAX_SPAN - (K-1)*gap, split into K equal-duration service periods.
 
-ASSIGNMENTS (25) — systematic over pattern family x group-count up to MAX_K:
-  all_to_one(G0)        x1   (max concentration)
-  round_robin N=2..10   x9   (uniform cyclic spread, all group counts)
-  split_n     N=2..10   x9   (contiguous sequential blocks -> isolates index blocks,
-                              i.e. the contiguous high-index REHDs)
-  weighted front/back   x4   (2g + 4g imbalance corners)
-  interleave step=2,3   x2   (block-of-K alternation)
-  => 25 assignments.
+ASSIGNMENTS (25):
+  round_robin N in RR_NS           x4   (spread comms, no isolation group)
+  split_n     N in SPLIT_NS        x9   (contiguous blocks; the last isolates the high-index REHD tail)
+  weighted    m in HARVEST_TAILS,  x12  (last m STAs -> 1 harvest group,
+              c in HARVEST_COMMS          the other 20 - m -> c comms groups)
 
 apply_assignment_pattern() (runtime helper, imported by
-ppo-sb3-scripts/twt_spawn_worker.build_action_dict) is UNCHANGED below.
+ppo-sb3-scripts/twt_spawn_worker.build_action_dict) expands a pattern into (sta_id, group_id) pairs.
 """
 
 import os
@@ -64,7 +50,7 @@ MAX_K = 16  # C++ ceiling MAX_NUM_TWT_GROUPS=16
 # CARVED grid (2026-06-21, EDA-shaped from runs/eda_full_20260621).
 # The prior coarse 30x25 grid was run through the variable-split EDA; this carve keeps the proven winners and prunes the dominated/dead actions (a strict SUBSET of EDA-tested actions — no new mechanism, no re-validation needed):
 #   schedules : K in SCHED_KS x budget BUDGET_FRACS  (K=1 dead, K>=7 cold, frac=0.30 dead)
-#   assignment: split_n SPLIT_NS (contiguous REHD-tail isolator; EDA-best 0.76-0.81 REHD served across ALL REHD counts) + round_robin RR_NS (congestion-bound fallback: spread comms, no isolation group). all_to_one / interleave / weighted DROPPED (scatter REHDs into busy SPs / dominated in welfare).
+#   assignment: split_n SPLIT_NS (contiguous REHD-tail isolator; EDA-best 0.76-0.81 REHD served across ALL REHD counts) + round_robin RR_NS (congestion-bound fallback: spread comms, no isolation group). all_to_one / interleave / front-back weighted DROPPED (scatter REHDs into busy SPs / dominated in welfare); weighted is reused below for explicit REHD-tail cuts.
 #   PDW       : all 10 levels kept (best PDW shifts 0->9 with REHD count = the key lever).
 SCHED_KS = [2, 3, 4, 5, 6, 8]  # hot K=2..6 (peak 3-4) + K=8 hi-REHD fine isolation
 BUDGET_FRACS = [
@@ -147,7 +133,7 @@ def gen_assignments():
         A.append(d)
 
     # round_robin RR_NS — congestion-bound fallback: cyclic spread of comms, NO dedicated REHD group (best non-REHD served; the right move when load is airtime-bound, not energy-bound).
-    # Kept small (2..4); higher-n round_robin scatters the REHD tail.
+    # Kept small (2..5); higher-n round_robin scatters the REHD tail.
     for n in RR_NS:
         add(
             {

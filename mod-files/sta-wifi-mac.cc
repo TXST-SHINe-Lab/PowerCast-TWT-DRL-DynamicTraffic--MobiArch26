@@ -6,6 +6,10 @@
  *
  * Authors: Mathieu Lacage <mathieu.lacage@sophia.inria.fr>
  *          Mirko Banchi <mk.banchi@gmail.com>
+ *
+ * Modified by: Ahmed Maksud <ahmed.maksud@email.ucr.edu>
+ *              Texas State University
+ *              Added GetTimeTillNextBeacon() for TWT schedule offset calculation
  */
 
 #include "sta-wifi-mac.h"
